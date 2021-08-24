@@ -150,6 +150,10 @@ func InserirUsuario(c context.Context, usuario *Usuario) error {
 		return fmt.Errorf("Nenhum nome informado: %v", usuario.Nome)
 	}
 
+	if usuario.Nick == "" {
+		return fmt.Errorf("Nenhum nick informado: %v", usuario.Nick)
+	}
+
 	if usuario.Email == "" {
 		return fmt.Errorf("Nenhum email informado: %v", usuario.Email)
 	}
