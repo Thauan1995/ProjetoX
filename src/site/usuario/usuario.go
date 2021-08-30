@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"cloud.google.com/go/datastore"
+	"github.com/badoux/checkmail"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -82,7 +83,7 @@ func PutUsuario(c context.Context, usuario *Usuario) error {
 	key := datastore.IDKey(KindUsuario, usuario.ID, nil)
 	key, err = datastoreClient.Put(c, key, usuario)
 	if err != nil {
-		log.Warningf(c, "Erro ao inserir usuario: %v", err)
+		log.Warningf(c, "Erro ao atualizar usuario: %v", err)
 		return err
 	}
 	usuario.ID = key.ID
@@ -159,6 +160,10 @@ func InserirUsuario(c context.Context, usuario *Usuario) error {
 
 	if usuario.Email == "" {
 		return fmt.Errorf("Nenhum email informado: %v", usuario.Email)
+	}
+	validaEmail := checkmail.ValidateFormat(usuario.Email)
+	if validaEmail != nil {
+		return fmt.Errorf("Email inserido inválido")
 	}
 
 	if usuario.Senha == "" {

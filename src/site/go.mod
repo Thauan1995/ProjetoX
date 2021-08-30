@@ -6,6 +6,7 @@ require (
 	cloud.google.com/go v0.93.3 // indirect
 	cloud.google.com/go/datastore v1.5.0
 	cloud.google.com/go/logging v1.4.2
+	github.com/badoux/checkmail v1.2.1 
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/googleapis/gax-go/v2 v2.1.0 // indirect
 	github.com/gorilla/mux v1.8.0

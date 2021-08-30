@@ -16,6 +16,9 @@ cloud.google.com/go/datastore/internal/gaepb
 cloud.google.com/go/logging
 cloud.google.com/go/logging/apiv2
 cloud.google.com/go/logging/internal
+# github.com/badoux/checkmail v1.2.1
+## explicit
+github.com/badoux/checkmail
 # github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da
 ## explicit
 github.com/golang/groupcache/lru
@@ -80,8 +83,6 @@ go.opencensus.io/trace/tracestate
 ## explicit
 golang.org/x/crypto/bcrypt
 golang.org/x/crypto/blowfish
-# golang.org/x/mod v0.5.0
-## explicit
 # golang.org/x/net v0.0.0-20210825183410-e898025ed96a
 ## explicit
 golang.org/x/net/context
