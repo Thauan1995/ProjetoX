@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"cloud.google.com/go/datastore"
+	"golang.org/x/crypto/bcrypt"
 )
 
 const (
@@ -162,6 +163,15 @@ func InserirUsuario(c context.Context, usuario *Usuario) error {
 	if usuario.Senha == "" {
 		return fmt.Errorf("Nenhuma senha informada: %v", usuario.Senha)
 	}
+	cost := bcrypt.DefaultCost
+
+	hash, err := bcrypt.GenerateFromPassword([]byte(usuario.Senha), cost)
+
+	if err != nil {
+		panic(err.Error())
+	}
+
+	usuario.Senha = string(hash)
 
 	if usuario.ID == 0 {
 		usuario.DataCriacao = utils.GetTimeNow()
