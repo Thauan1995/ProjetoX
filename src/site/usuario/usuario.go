@@ -6,6 +6,7 @@ import (
 	"site/utils"
 	"site/utils/consts"
 	"site/utils/log"
+	"strings"
 	"time"
 
 	"cloud.google.com/go/datastore"
@@ -166,12 +167,14 @@ func InserirUsuario(c context.Context, usuario *Usuario) error {
 	cost := bcrypt.DefaultCost
 
 	hash, err := bcrypt.GenerateFromPassword([]byte(usuario.Senha), cost)
-
 	if err != nil {
 		panic(err.Error())
 	}
-
 	usuario.Senha = string(hash)
+
+	usuario.Nome = strings.TrimSpace(usuario.Nome)
+	usuario.Nick = strings.TrimSpace(usuario.Nick)
+	usuario.Email = strings.TrimSpace(usuario.Email)
 
 	if usuario.ID == 0 {
 		usuario.DataCriacao = utils.GetTimeNow()
