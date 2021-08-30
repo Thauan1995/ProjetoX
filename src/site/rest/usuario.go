@@ -86,5 +86,5 @@ func InsereUsuario(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	log.Debugf(c, "Usuario inserido com sucesso")
-	utils.RespondWithJSON(w, http.StatusOK, usuarios)
+	utils.RespondWithJSON(w, http.StatusOK, "Usuario Inserido com sucesso")
 }
