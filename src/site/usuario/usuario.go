@@ -3,6 +3,7 @@ package usuario
 import (
 	"context"
 	"fmt"
+	"site/utils"
 	"site/utils/consts"
 	"site/utils/log"
 	"time"
@@ -160,6 +161,10 @@ func InserirUsuario(c context.Context, usuario *Usuario) error {
 
 	if usuario.Senha == "" {
 		return fmt.Errorf("Nenhuma senha informada: %v", usuario.Senha)
+	}
+
+	if usuario.ID == 0 {
+		usuario.DataCriacao = utils.GetTimeNow()
 	}
 
 	return PutUsuario(c, usuario)
