@@ -15,6 +15,7 @@ func main() {
 
 	//Usuario
 	r.HandleFunc("/usuario", rest.UsuarioHandler)
+	r.HandleFunc("/usuario/login", rest.LoginHandler)
 
 	http.Handle("/", router)
 
