@@ -40,5 +40,5 @@ func AutenticarUsuario(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// parado na Aula 86
-	// voltar para aula 85 e verificar se há necessidade ne implementar metodos de valida e prepara
+	// voltar para aula 85 e verificar se há necessidade ne implementar metodos de valida() e prepara()
 }
