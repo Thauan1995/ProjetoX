@@ -147,28 +147,46 @@ func FiltrarUsuario(c context.Context, usuario Usuario) ([]Usuario, error) {
 	}
 	return GetMultUsuario(c, keys)
 }
-func InserirUsuario(c context.Context, usuario *Usuario) error {
-	log.Debugf(c, "Inserindo Usuario no banco: %v", usuario)
 
+// validar() valida os campos do processo
+func (usuario *Usuario) validar(etapa string) error {
 	if usuario.Nome == "" {
-		return fmt.Errorf("Nenhum nome informado: %v", usuario.Nome)
+		return fmt.Errorf("O campo nome é obrigatório: %v", usuario.Nome)
 	}
 
 	if usuario.Nick == "" {
-		return fmt.Errorf("Nenhum nick informado: %v", usuario.Nick)
+		return fmt.Errorf("O campo nick é obrigatório: %v", usuario.Nick)
 	}
 
 	if usuario.Email == "" {
-		return fmt.Errorf("Nenhum email informado: %v", usuario.Email)
+		return fmt.Errorf("O campo email é obrigatório: %v", usuario.Email)
 	}
+
+	if etapa == "cadastro" && usuario.Senha == "" {
+		return fmt.Errorf("O campo senha é obrigatório")
+	}
+
+	return nil
+}
+
+func (usuario *Usuario) Preparar(etapa string) error {
+	if err := usuario.validar(etapa); err != nil {
+		return err
+	}
+	return nil
+}
+func InserirUsuario(c context.Context, usuario *Usuario) error {
+	log.Debugf(c, "Inserindo Usuario no banco: %v", usuario)
+
+	if err := usuario.Preparar("cadastro"); err != nil {
+		return fmt.Errorf("Erro ao validar campos de usuario %v", err)
+	}
+
 	validaEmail := checkmail.ValidateFormat(usuario.Email)
 	if validaEmail != nil {
 		return fmt.Errorf("Email inserido inválido")
 	}
 
-	if usuario.Senha == "" {
-		return fmt.Errorf("Nenhuma senha informada: %v", usuario.Senha)
-	}
 	cost := bcrypt.DefaultCost
 
 	hash, err := bcrypt.GenerateFromPassword([]byte(usuario.Senha), cost)
