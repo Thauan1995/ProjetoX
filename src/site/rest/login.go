@@ -31,7 +31,7 @@ func AutenticarUsuario(w http.ResponseWriter, r *http.Request) {
 		utils.RespondWithError(w, http.StatusBadRequest, 0, "Erro ao receber body para autenticar usuario")
 		return
 	}
-
+	log.Infof(c, "Corpo : %v", corpoRequisicao)
 	var usuarioLogin usuario.Usuario
 	err = json.Unmarshal(corpoRequisicao, &usuarioLogin)
 	if err != nil {
