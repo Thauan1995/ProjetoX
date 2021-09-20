@@ -179,7 +179,7 @@ func InserirUsuario(c context.Context, usuario *Usuario) error {
 	log.Debugf(c, "Inserindo Usuario no banco: %v", usuario)
 
 	if err := usuario.Preparar("cadastro"); err != nil {
-		return fmt.Errorf("Erro ao validar campos de usuario %v", err)
+		return fmt.Errorf("Erro ao preparar campos de usuario %v", err)
 	}
 
 	validaEmail := checkmail.ValidateFormat(usuario.Email)
