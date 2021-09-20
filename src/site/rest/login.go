@@ -31,15 +31,15 @@ func AutenticarUsuario(w http.ResponseWriter, r *http.Request) {
 		utils.RespondWithError(w, http.StatusBadRequest, 0, "Erro ao receber body para autenticar usuario")
 		return
 	}
-	log.Infof(c, "Corpo : %v", corpoRequisicao)
-	var usuarioLogin usuario.Usuario
+	log.Infof(c, "Corpo : %v", string(corpoRequisicao))
+	var usuarioLogin usuario.Login
 	err = json.Unmarshal(corpoRequisicao, &usuarioLogin)
 	if err != nil {
 		log.Warningf(c, "Erro ao fazer unmarshal do corpo da requisição de usuario: %v", err)
 		utils.RespondWithError(w, http.StatusBadRequest, 0, "Erro ao fazer unmarshal do corpo da requisição de usuario")
 		return
 	}
-	usuarioBanco := usuario.GetUsuario(c, usuarioLogin.ID)
+	usuarioBanco := usuario.GetUsuarioByEmail(c, usuarioLogin.Email)
 
 	err = seguranca.VerifcarSenha(usuarioBanco.Senha, usuarioLogin.Senha)
 	if err != nil {

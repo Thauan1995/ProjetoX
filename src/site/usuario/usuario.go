@@ -27,6 +27,12 @@ type Usuario struct {
 	DataCriacao time.Time
 }
 
+type Login struct {
+	Nick  string
+	Email string
+	Senha string
+}
+
 func GetUsuario(c context.Context, id int64) *Usuario {
 	datastoreClient, err := datastore.NewClient(c, consts.IDProjeto)
 	if err != nil {
@@ -204,4 +210,23 @@ func InserirUsuario(c context.Context, usuario *Usuario) error {
 	}
 
 	return PutUsuario(c, usuario)
+}
+
+func GetUsuarioByEmail(c context.Context, email string) *Usuario {
+	datastoreClient, err := datastore.NewClient(c, consts.IDProjeto)
+	if err != nil {
+		log.Warningf(c, "Falha ao conectar-se com o Datastore: %v", err)
+		return nil
+	}
+	defer datastoreClient.Close()
+
+	key := datastore.NameKey(KindUsuario, email, nil)
+
+	var usuario Usuario
+	if err = datastoreClient.Get(c, key, &usuario); err != nil {
+		log.Warningf(c, "Falha ao buscar Usuario: %v", err)
+		return nil
+	}
+	usuario.Email = email
+	return &usuario
 }
