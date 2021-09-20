@@ -12,7 +12,15 @@ import (
 
 // Login é responsavel por autenticar um usuario na API
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
+	c := r.Context()
 
+	if r.Method == http.MethodPost {
+		AutenticarUsuario(w, r)
+		return
+	}
+
+	log.Warningf(c, "Método não permitido")
+	utils.RespondWithError(w, http.StatusMethodNotAllowed, 0, "Método não permitido")
 }
 
 func AutenticarUsuario(w http.ResponseWriter, r *http.Request) {
@@ -39,6 +47,7 @@ func AutenticarUsuario(w http.ResponseWriter, r *http.Request) {
 		utils.RespondWithError(w, http.StatusBadRequest, 0, "Senha inserida no login não compativel com a cadastrada no banco")
 		return
 	}
-	// parado na Aula 86
-	// voltar para aula 85 e verificar se há necessidade ne implementar metodos de valida() e prepara()
+
+	w.Write([]byte("Você está logado! Parabens!"))
+
 }
