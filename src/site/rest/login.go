@@ -33,9 +33,7 @@ func AcessarUsuario(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Infof(c, "Corpo : %v", string(corpoRequisicao))
 	var usuarioLogin usuario.Usuario
-	log.Infof(c, "estrutura: %v", usuarioLogin)
 
 	err = json.Unmarshal(corpoRequisicao, &usuarioLogin)
 	if err != nil {
@@ -43,7 +41,6 @@ func AcessarUsuario(w http.ResponseWriter, r *http.Request) {
 		utils.RespondWithError(w, http.StatusBadRequest, 0, "Erro ao fazer unmarshal do corpo da requisição de usuario")
 		return
 	}
-	log.Infof(c, "fez o Unmarshal")
 
 	usuarioBanco, err := usuario.FiltrarUsuario(c, usuarioLogin)
 
