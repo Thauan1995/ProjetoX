@@ -26,19 +26,23 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 func AutenticarUsuario(w http.ResponseWriter, r *http.Request) {
 	c := r.Context()
 	corpoRequisicao, err := ioutil.ReadAll(r.Body)
+
 	if err != nil {
 		log.Warningf(c, "Erro ao receber body para autenticar usuario %v", err)
 		utils.RespondWithError(w, http.StatusBadRequest, 0, "Erro ao receber body para autenticar usuario")
 		return
 	}
+
 	log.Infof(c, "Corpo : %v", string(corpoRequisicao))
-	var usuarioLogin *usuario.Login
+	var usuarioLogin usuario.Login
+
 	err = json.Unmarshal(corpoRequisicao, &usuarioLogin)
 	if err != nil {
 		log.Warningf(c, "Erro ao fazer unmarshal do corpo da requisição de usuario: %v", err)
 		utils.RespondWithError(w, http.StatusBadRequest, 0, "Erro ao fazer unmarshal do corpo da requisição de usuario")
 		return
 	}
+
 	usuarioBanco := usuario.GetUsuarioByEmail(c, usuarioLogin.Email)
 
 	err = seguranca.VerifcarSenha(usuarioBanco.Senha, usuarioLogin.Senha)
