@@ -15,7 +15,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	c := r.Context()
 
 	if r.Method == http.MethodPost {
-		AutenticarUsuario(w, r)
+		AcessarUsuario(w, r)
 		return
 	}
 
@@ -23,7 +23,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	utils.RespondWithError(w, http.StatusMethodNotAllowed, 0, "Método não permitido")
 }
 
-func AutenticarUsuario(w http.ResponseWriter, r *http.Request) {
+func AcessarUsuario(w http.ResponseWriter, r *http.Request) {
 	c := r.Context()
 	corpoRequisicao, err := ioutil.ReadAll(r.Body)
 
@@ -34,7 +34,7 @@ func AutenticarUsuario(w http.ResponseWriter, r *http.Request) {
 	}
 
 	log.Infof(c, "Corpo : %v", string(corpoRequisicao))
-	var usuarioLogin *usuario.Login
+	var usuarioLogin usuario.Usuario
 	log.Infof(c, "estrutura: %v", usuarioLogin)
 
 	err = json.Unmarshal(corpoRequisicao, &usuarioLogin)

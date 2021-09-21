@@ -27,12 +27,6 @@ type Usuario struct {
 	DataCriacao time.Time
 }
 
-type Login struct {
-	Nick  string
-	Email string
-	Senha string
-}
-
 func GetUsuario(c context.Context, id int64) *Usuario {
 	datastoreClient, err := datastore.NewClient(c, consts.IDProjeto)
 	if err != nil {
