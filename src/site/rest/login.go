@@ -34,7 +34,7 @@ func AutenticarUsuario(w http.ResponseWriter, r *http.Request) {
 	}
 
 	log.Infof(c, "Corpo : %v", string(corpoRequisicao))
-	var usuarioLogin usuario.Login
+	var usuarioLogin *usuario.Login
 	log.Infof(c, "estrutura: %v", usuarioLogin)
 
 	err = json.Unmarshal(corpoRequisicao, &usuarioLogin)
