@@ -2,8 +2,10 @@ package rest
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
+	"site/autenticacao"
 	"site/seguranca"
 	"site/usuario"
 	"site/utils"
@@ -44,13 +46,15 @@ func AcessarUsuario(w http.ResponseWriter, r *http.Request) {
 
 	usuarioBanco, err := usuario.FiltrarUsuario(c, usuarioLogin)
 
-	for _, v := range usuarioBanco {
-		err = seguranca.VerifcarSenha(v.Senha, usuarioLogin.Senha)
+	for _, usu := range usuarioBanco {
+		err = seguranca.VerifcarSenha(usu.Senha, usuarioLogin.Senha)
 		if err != nil {
 			log.Warningf(c, "Senha inserida no login não compativel com a cadastrada no banco: %v", err)
 			utils.RespondWithError(w, http.StatusBadRequest, 0, "Senha inserida no login não compativel com a cadastrada no banco")
 			return
 		}
+		token, _ := autenticacao.CriarToken(usu.ID)
+		fmt.Println(token)
 	}
 
 	w.Write([]byte("Você está logado! Parabens!"))

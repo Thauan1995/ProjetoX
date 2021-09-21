@@ -19,6 +19,9 @@ cloud.google.com/go/logging/internal
 # github.com/badoux/checkmail v1.2.1
 ## explicit
 github.com/badoux/checkmail
+# github.com/dgrijalva/jwt-go v3.2.0+incompatible
+## explicit
+github.com/dgrijalva/jwt-go
 # github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da
 ## explicit
 github.com/golang/groupcache/lru
