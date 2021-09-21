@@ -43,6 +43,7 @@ func AutenticarUsuario(w http.ResponseWriter, r *http.Request) {
 		utils.RespondWithError(w, http.StatusBadRequest, 0, "Erro ao fazer unmarshal do corpo da requisição de usuario")
 		return
 	}
+	log.Infof(c, "fez o Unmarshal")
 
 	usuarioBanco := usuario.GetUsuarioByEmail(c, usuarioLogin.Email)
 
