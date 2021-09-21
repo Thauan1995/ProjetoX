@@ -215,10 +215,11 @@ func GetUsuarioByEmail(c context.Context, email string) *Usuario {
 	defer datastoreClient.Close()
 
 	key := datastore.NameKey(KindUsuario, email, nil)
-
+	log.Infof(c, "key = %#v", key)
 	var usuario Usuario
-	if err = datastoreClient.Get(c, key, &usuario); err != nil {
-		log.Warningf(c, "Falha ao buscar Usuario: %v", err)
+	err = datastoreClient.Get(c, key, &usuario)
+	if err != nil {
+		log.Warningf(c, "Erro ao buscar Usuario pelo email: %#v", err)
 		return nil
 	}
 	usuario.Email = email
