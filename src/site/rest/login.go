@@ -12,33 +12,50 @@ import (
 
 // Login é responsavel por autenticar um usuario na API
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
+	c := r.Context()
 
+	if r.Method == http.MethodPost {
+		AcessarUsuario(w, r)
+		return
+	}
+
+	log.Warningf(c, "Método não permitido")
+	utils.RespondWithError(w, http.StatusMethodNotAllowed, 0, "Método não permitido")
 }
 
-func AutenticarUsuario(w http.ResponseWriter, r *http.Request) {
+func AcessarUsuario(w http.ResponseWriter, r *http.Request) {
 	c := r.Context()
 	corpoRequisicao, err := ioutil.ReadAll(r.Body)
+
 	if err != nil {
 		log.Warningf(c, "Erro ao receber body para autenticar usuario %v", err)
 		utils.RespondWithError(w, http.StatusBadRequest, 0, "Erro ao receber body para autenticar usuario")
 		return
 	}
 
+	log.Infof(c, "Corpo : %v", string(corpoRequisicao))
 	var usuarioLogin usuario.Usuario
+	log.Infof(c, "estrutura: %v", usuarioLogin)
+
 	err = json.Unmarshal(corpoRequisicao, &usuarioLogin)
 	if err != nil {
 		log.Warningf(c, "Erro ao fazer unmarshal do corpo da requisição de usuario: %v", err)
 		utils.RespondWithError(w, http.StatusBadRequest, 0, "Erro ao fazer unmarshal do corpo da requisição de usuario")
 		return
 	}
-	usuarioBanco := usuario.GetUsuario(c, usuarioLogin.ID)
+	log.Infof(c, "fez o Unmarshal")
 
-	err = seguranca.VerifcarSenha(usuarioBanco.Senha, usuarioLogin.Senha)
-	if err != nil {
-		log.Warningf(c, "Senha inserida no login não compativel com a cadastrada no banco: %v", err)
-		utils.RespondWithError(w, http.StatusBadRequest, 0, "Senha inserida no login não compativel com a cadastrada no banco")
-		return
+	usuarioBanco, err := usuario.FiltrarUsuario(c, usuarioLogin)
+
+	for _, v := range usuarioBanco {
+		err = seguranca.VerifcarSenha(v.Senha, usuarioLogin.Senha)
+		if err != nil {
+			log.Warningf(c, "Senha inserida no login não compativel com a cadastrada no banco: %v", err)
+			utils.RespondWithError(w, http.StatusBadRequest, 0, "Senha inserida no login não compativel com a cadastrada no banco")
+			return
+		}
 	}
-	// parado na Aula 86
-	// voltar para aula 85 e verificar se há necessidade ne implementar metodos de valida() e prepara()
+
+	w.Write([]byte("Você está logado! Parabens!"))
+
 }
