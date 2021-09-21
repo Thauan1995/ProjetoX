@@ -45,13 +45,15 @@ func AcessarUsuario(w http.ResponseWriter, r *http.Request) {
 	}
 	log.Infof(c, "fez o Unmarshal")
 
-	usuarioBanco := usuario.GetUsuarioByEmail(c, usuarioLogin.Email)
+	usuarioBanco, err := usuario.FiltrarUsuario(c, usuarioLogin)
 
-	err = seguranca.VerifcarSenha(usuarioBanco.Senha, usuarioLogin.Senha)
-	if err != nil {
-		log.Warningf(c, "Senha inserida no login não compativel com a cadastrada no banco: %v", err)
-		utils.RespondWithError(w, http.StatusBadRequest, 0, "Senha inserida no login não compativel com a cadastrada no banco")
-		return
+	for _, v := range usuarioBanco {
+		err = seguranca.VerifcarSenha(v.Senha, usuarioLogin.Senha)
+		if err != nil {
+			log.Warningf(c, "Senha inserida no login não compativel com a cadastrada no banco: %v", err)
+			utils.RespondWithError(w, http.StatusBadRequest, 0, "Senha inserida no login não compativel com a cadastrada no banco")
+			return
+		}
 	}
 
 	w.Write([]byte("Você está logado! Parabens!"))

@@ -206,22 +206,22 @@ func InserirUsuario(c context.Context, usuario *Usuario) error {
 	return PutUsuario(c, usuario)
 }
 
-func GetUsuarioByEmail(c context.Context, id string) *Usuario {
-	datastoreClient, err := datastore.NewClient(c, consts.IDProjeto)
-	if err != nil {
-		log.Warningf(c, "Falha ao conectar-se com o Datastore: %v", err)
-		return nil
-	}
-	defer datastoreClient.Close()
-
-	key := datastore.NameKey(KindUsuario, id, nil)
-	log.Infof(c, "key = %#v", key)
-	var usuario Usuario
-	err = datastoreClient.Get(c, key, &usuario)
-	if err != nil {
-		log.Warningf(c, "Erro ao buscar Usuario pelo email: %#v", err)
-		return nil
-	}
-	usuario.Email = id
-	return &usuario
-}
+//func GetUsuarioByEmail(c context.Context, email string) *Usuario {
+//datastoreClient, err := datastore.NewClient(c, consts.IDProjeto)
+//if err != nil {
+//log.Warningf(c, "Falha ao conectar-se com o Datastore: %v", err)
+//return nil
+//}
+//defer datastoreClient.Close()
+//
+//key := datastore.NameKey(KindUsuario, email, nil)
+//log.Infof(c, "key = %#v", key)
+//var usuario Usuario
+//err = datastoreClient.Get(c, key, &usuario)
+//if err != nil {
+//log.Warningf(c, "Erro ao buscar Usuario pelo email: %#v", err)
+//return nil
+//}
+//usuario.Email = email
+//return &usuario
+//}
