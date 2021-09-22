@@ -2,7 +2,6 @@ package rest
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"site/autenticacao"
@@ -54,7 +53,7 @@ func AcessarUsuario(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		token, _ := autenticacao.CriarToken(usu.ID)
-		fmt.Println(token)
+		log.Infof(c, "Token gerado para autenticação: %v", token)
 	}
 
 	w.Write([]byte("Você está logado! Parabens!"))

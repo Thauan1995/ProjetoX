@@ -1,6 +1,9 @@
 package main
 
 import (
+	"crypto/rand"
+	"encoding/base64"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -8,6 +11,17 @@ import (
 
 	"github.com/gorilla/mux"
 )
+
+func init() {
+	chave := make([]byte, 64)
+
+	if _, err := rand.Read(chave); err != nil {
+		log.Fatal("Erro ao criar chave Secret", err)
+	}
+
+	stringBase64 := base64.StdEncoding.EncodeToString(chave)
+	fmt.Println(stringBase64)
+}
 
 func main() {
 	router := mux.NewRouter()
