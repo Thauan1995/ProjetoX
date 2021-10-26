@@ -26,8 +26,8 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 
 func AcessarUsuario(w http.ResponseWriter, r *http.Request) {
 	c := r.Context()
-	corpoRequisicao, err := ioutil.ReadAll(r.Body)
 
+	corpoRequisicao, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		log.Warningf(c, "Erro ao receber body para autenticar usuario %v", err)
 		utils.RespondWithError(w, http.StatusBadRequest, 0, "Erro ao receber body para autenticar usuario")
