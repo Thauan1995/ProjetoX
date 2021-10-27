@@ -31,6 +31,9 @@ func main() {
 	r.HandleFunc("/usuario", rest.UsuarioHandler)
 	r.HandleFunc("/usuario/login", rest.LoginHandler)
 
+	//Config
+	r.HandleFunc("/config", rest.ConfigHandler)
+
 	http.Handle("/", router)
 
 	var port = os.Getenv("PORT")

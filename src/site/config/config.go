@@ -13,20 +13,7 @@ import (
 const (
 	ConfigKind = "Config"
 
-	APIToken              = "apitoken"
-	IDStatusPedidoInicial = "statuspedidoinicial"
-	CNPJsSimpress         = "cnpjs.simpress"
-	CNPJsCristalia        = "cnpjs.cristalia"
-	CNPJsCobasi           = "cnpjs.cobasi"
-	CNPJsUniaoQuimica     = "cnpjs.uniaoquimica"
-	IDMotivoPedidoInicial = "idmotivoinicial"
-
-	LayoutEtiqueta          = "layoutetiqueta"
-	LayoutEtiquetaHistorico = "layoutetiquetahistorico"
-
-	SendGridAPIKey = "sendgrid.apikey"
-	SendGridSender = "sendgrid.sender"
-	SendGridName   = "sendgrid.name"
+	APIToken = "apitoken"
 
 	AppraticoSite     = "appratico.site"
 	AppraticoAPIToken = "appratico.apitoken"
@@ -34,9 +21,6 @@ const (
 	ElasticSearchEndpoint = "elasticsearch.endpoint"
 	ElasticSearchUsername = "elasticsearch.username"
 	ElasticSearchPassword = "elasticsearch.password"
-
-	ChaveAutenticacaoAcesso = "login.chaveautenticacao"
-	TempoExpiracaoAcesso    = "login.tempoexpiracao"
 )
 
 type Config struct {
