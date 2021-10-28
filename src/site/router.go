@@ -14,7 +14,8 @@ func main() {
 	r := router.PathPrefix("/api").Subrouter()
 
 	//Usuario
-	r.HandleFunc("/usuario", rest.UsuarioHandler)
+	r.HandleFunc("/usuario/buscar", rest.BuscaUsuarioHandler)
+	r.HandleFunc("/usuario/registrar", rest.RegistraUsuarioHandler)
 	r.HandleFunc("/usuario/login", rest.LoginHandler)
 
 	//Config

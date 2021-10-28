@@ -10,13 +10,20 @@ import (
 	"strconv"
 )
 
-func UsuarioHandler(w http.ResponseWriter, r *http.Request) {
+func BuscaUsuarioHandler(w http.ResponseWriter, r *http.Request) {
 	c := r.Context()
 
 	if r.Method == http.MethodGet {
 		BuscaUsuario(w, r)
 		return
 	}
+
+	log.Warningf(c, "Método não permitido")
+	utils.RespondWithError(w, http.StatusMethodNotAllowed, 0, "Método não permitido")
+}
+
+func RegistraUsuarioHandler(w http.ResponseWriter, r *http.Request) {
+	c := r.Context()
 
 	if r.Method == http.MethodPost {
 		InsereUsuario(w, r)
