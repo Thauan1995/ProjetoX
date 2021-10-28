@@ -15,8 +15,8 @@ const (
 
 	APIToken = "apitoken"
 
-	AppraticoSite     = "appratico.site"
-	AppraticoAPIToken = "appratico.apitoken"
+	ChaveAutenticacaoAcesso = "login.chaveautenticacao"
+	TempoExpiracaoAcesso    = "login.tempoexpiracao"
 
 	ElasticSearchEndpoint = "elasticsearch.endpoint"
 	ElasticSearchUsername = "elasticsearch.username"
