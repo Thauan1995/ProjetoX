@@ -160,7 +160,7 @@ func CriarSessao(c context.Context, idUsuario int64) (string, int) {
 		return "", ErrChaveAutenticacao
 	}
 
-	token := jwt.NewWithClaims(jwt.SigningMethodES256, credenciais)
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, credenciais)
 
 	tokenString, err := token.SignedString([]byte(chaveSecreta.Value))
 	if err != nil {
