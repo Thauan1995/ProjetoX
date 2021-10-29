@@ -189,10 +189,5 @@ func Current(r *http.Request) *Usuario {
 		log.Warningf(c, "Usuario não encotrado no ID: '%d'", claims.IDUsuario)
 		return nil
 	}
-
-	if u.Inativo {
-		log.Warningf(c, "Usuario invativo")
-		return nil
-	}
 	return u
 }

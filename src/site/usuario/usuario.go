@@ -30,7 +30,6 @@ const (
 	ErrEmailRegistrado   = 411
 	ErrCPFRegistrado     = 412
 	ErrRegistroPendente  = 413
-	ErrInativo           = 414
 	ErrRedefinirSenha    = 415
 	ErrChaveAutenticacao = 416
 	ErrAssinarChave      = 417
@@ -45,7 +44,6 @@ type Usuario struct {
 	Nick        string
 	Email       string
 	Senha       string
-	Inativo     bool
 	DataCriacao time.Time
 }
 
@@ -142,7 +140,7 @@ func FiltrarUsuario(c context.Context, usuario Usuario) ([]Usuario, error) {
 	}
 	defer datastoreClient.Close()
 
-	q := datastore.NewQuery(KindUsuario).Filter("Inativo =", false)
+	q := datastore.NewQuery(KindUsuario)
 
 	if usuario.Nome != "" {
 		q = q.Filter("Nome =", usuario.Nome)
@@ -257,8 +255,6 @@ func GetErro(code int) string {
 		return "CNPJ ja registrado"
 	case ErrRegistroPendente:
 		return "Registro pendente"
-	case ErrInativo:
-		return "Usuario inátivo"
 	case ErrRedefinirSenha:
 		return "Erro ao redefinir senha"
 	case ErrChaveAutenticacao:
