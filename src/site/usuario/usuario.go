@@ -16,6 +16,26 @@ import (
 
 const (
 	KindUsuario = "Usuario"
+
+	ErrUsuarioInvalido   = 401
+	ErrEmailInvalido     = 402
+	ErrCPFInvalido       = 403
+	ErrCNPJInvalido      = 404
+	ErrCelularInvalido   = 405
+	ErrSenhaInvalida     = 406
+	ErrInserirUsuario    = 407
+	ErrBuscarUsuario     = 408
+	ErrNaoEncontrado     = 409
+	ErrSenhaIncorreta    = 410
+	ErrEmailRegistrado   = 411
+	ErrCPFRegistrado     = 412
+	ErrRegistroPendente  = 413
+	ErrRedefinirSenha    = 415
+	ErrChaveAutenticacao = 416
+	ErrAssinarChave      = 417
+	ErrChaveInvalida     = 418
+	ErrCNPJRegistrado    = 419
+	ErrDesconhecido      = 999
 )
 
 type Usuario struct {
@@ -204,6 +224,48 @@ func InserirUsuario(c context.Context, usuario *Usuario) error {
 	}
 
 	return PutUsuario(c, usuario)
+}
+func GetErro(code int) string {
+	switch code {
+	case ErrUsuarioInvalido:
+		return "Usuário Inválido"
+	case ErrEmailInvalido:
+		return "Email Inválido"
+	case ErrCPFInvalido:
+		return "CPF Inválido"
+	case ErrCNPJInvalido:
+		return "CNPJ Inválido"
+	case ErrCelularInvalido:
+		return "Celular Inválido"
+	case ErrSenhaInvalida:
+		return "Senha Inválida"
+	case ErrInserirUsuario:
+		return "Erro ao salvar Usuario"
+	case ErrBuscarUsuario:
+		return "Erro ao consultar Usuario"
+	case ErrNaoEncontrado:
+		return "Usuario nao encontrado"
+	case ErrSenhaIncorreta:
+		return "Senha incorreta"
+	case ErrEmailRegistrado:
+		return "E-mail ja registrado"
+	case ErrCPFRegistrado:
+		return "CPF ja registrado"
+	case ErrCNPJRegistrado:
+		return "CNPJ ja registrado"
+	case ErrRegistroPendente:
+		return "Registro pendente"
+	case ErrRedefinirSenha:
+		return "Erro ao redefinir senha"
+	case ErrChaveAutenticacao:
+		return "Erro ao buscar chave de autenticação de acesso"
+	case ErrAssinarChave:
+		return "Erro ao assinar chave de autenticação de acesso"
+	case ErrChaveInvalida:
+		return "Erro ao decodificar chave informada"
+	default:
+		return "Desconhecido"
+	}
 }
 
 //func GetUsuarioByEmail(c context.Context, email string) *Usuario {

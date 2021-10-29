@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
-	"site/autenticacao"
 	"site/seguranca"
 	"site/usuario"
 	"site/utils"
@@ -52,10 +51,16 @@ func AcessarUsuario(w http.ResponseWriter, r *http.Request) {
 			utils.RespondWithError(w, http.StatusBadRequest, 0, "Senha inserida no login não compativel com a cadastrada no banco")
 			return
 		}
-		token, _ := autenticacao.CriarToken(usu.ID)
-		log.Infof(c, "Token gerado para autenticação: %v", token)
-	}
+		autorizacao, code := usuario.CriarSessao(c, usu.ID)
+		if code != 0 {
+			log.Warningf(c, "Erro ao acessar: %v", usuario.GetErro(code))
+			utils.RespondWithError(w, http.StatusBadRequest, code, usuario.GetErro(code))
+			return
+		}
 
-	w.Write([]byte("Você está logado! Parabens!"))
+		w.Header().Set("Authoriozation", autorizacao)
+		log.Debugf(c, "Login autorizado com sucesso! Auth: %s", autorizacao)
+		utils.RespondWithJSON(w, http.StatusOK, usu)
+	}
 
 }
