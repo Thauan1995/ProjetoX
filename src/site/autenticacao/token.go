@@ -15,32 +15,30 @@ import (
 // Criar token retorna um token assinado com as permissões do usuario
 func CriarToken(c context.Context, usuarioID int64) (string, error) {
 
-	secretKey, err := config.GetConfig(c, config.ChaveAutenticacaoAcesso)
-	if err != nil {
-		log.Warningf(c, "Erro ao buscar Chave de Autenticação Acesso")
-		return "", fmt.Errorf("Erro ao buscar Chave de Autenticação Acesso")
-	}
-
 	permissoes := jwt.MapClaims{}
 	permissoes["authorized"] = true
 	permissoes["exp"] = time.Now().Add(time.Hour * 6).Unix()
 	permissoes["usuarioId"] = usuarioID
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, permissoes)
-	return token.SignedString([]byte(secretKey.Value))
+	return token.SignedString([]byte(config.SecretKey))
 }
 
 // ValidarToken verifica se o token passado na requisição é valido
 func ValidarToken(r *http.Request) error {
 	c := r.Context()
 	tokenString := extrairToken(r)
-	log.Infof(c, "tokenString %v", tokenString)
+
 	token, err := jwt.Parse(tokenString, retornaChaveVerificacao)
 	if err != nil {
 		log.Warningf(c, "Erro ao fazer o Parse do token: %v", err)
 		return err
 	}
-	log.Infof(c, "token: %v", token)
-	return nil
+
+	if _, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+		return nil
+	}
+	log.Warningf(c, "Token inválido")
+	return fmt.Errorf("Token inválido")
 }
 
 func extrairToken(r *http.Request) string {
@@ -53,13 +51,8 @@ func extrairToken(r *http.Request) string {
 }
 
 func retornaChaveVerificacao(token *jwt.Token) (interface{}, error) {
-	var c context.Context
-	secretKey, err := config.GetConfig(c, config.ChaveAutenticacaoAcesso)
-	if err != nil {
-		return "", fmt.Errorf("Erro ao buscar Chave de Autenticação Acesso")
-	}
 	if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 		return nil, fmt.Errorf("Método de assinatura inesperado! %v", token.Header["alg"])
 	}
-	return secretKey, nil
+	return config.SecretKey, nil
 }

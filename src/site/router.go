@@ -4,7 +4,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"site/middlewares"
 	"site/rest"
 
 	"github.com/gorilla/mux"
@@ -15,7 +14,7 @@ func main() {
 	r := router.PathPrefix("/api").Subrouter()
 
 	//Usuario
-	r.HandleFunc("/usuario/buscar", middlewares.Autenticar(rest.BuscaUsuarioHandler))
+	r.HandleFunc("/usuario/buscar", rest.BuscaUsuarioHandler)
 	r.HandleFunc("/usuario/registrar", rest.RegistraUsuarioHandler)
 	r.HandleFunc("/usuario/login", rest.LoginHandler)
 
