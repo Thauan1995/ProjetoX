@@ -23,6 +23,8 @@ const (
 	ElasticSearchPassword = "elasticsearch.password"
 )
 
+var SecretKey []byte
+
 type Config struct {
 	Name  string `datastore:"-"`
 	Value string `datastore:",noindex"`
@@ -108,4 +110,14 @@ func PutConfig(c context.Context, config *Config) error {
 
 	config.Name = key.Name
 	return nil
+}
+
+func BuscaSecret(c context.Context) {
+	chave, err := GetConfig(c, ChaveAutenticacaoAcesso)
+	if err != nil {
+		log.Warningf(c, "Falha ao buscar chave de autenticação %v", err)
+		return
+	}
+
+	SecretKey = []byte(chave.Value)
 }
