@@ -225,6 +225,25 @@ func InserirUsuario(c context.Context, usuario *Usuario) error {
 
 	return PutUsuario(c, usuario)
 }
+
+func AtualizarUsuario(c context.Context, usuario Usuario) error {
+	log.Infof(c, "Usuario: %v", usuario)
+	usuarioBanco := GetUsuario(c, usuario.ID)
+	log.Infof(c, "UsuarioBanco %v", usuarioBanco)
+
+	if err := usuario.Preparar("edicao"); err != nil {
+		log.Warningf(c, "Erro ao preparar usuario para edição %v", err)
+		return fmt.Errorf("Erro ao preparar usuario prar edição")
+	}
+
+	usuarioBanco.Nome = usuario.Nome
+	usuarioBanco.Nick = usuario.Nick
+	usuarioBanco.Email = usuario.Email
+	usuario.Senha = usuarioBanco.Senha
+
+	return PutUsuario(c, &usuario)
+}
+
 func GetErro(code int) string {
 	switch code {
 	case ErrUsuarioInvalido:
@@ -267,23 +286,3 @@ func GetErro(code int) string {
 		return "Desconhecido"
 	}
 }
-
-//func GetUsuarioByEmail(c context.Context, email string) *Usuario {
-//datastoreClient, err := datastore.NewClient(c, consts.IDProjeto)
-//if err != nil {
-//log.Warningf(c, "Falha ao conectar-se com o Datastore: %v", err)
-//return nil
-//}
-//defer datastoreClient.Close()
-//
-//key := datastore.NameKey(KindUsuario, email, nil)
-//log.Infof(c, "key = %#v", key)
-//var usuario Usuario
-//err = datastoreClient.Get(c, key, &usuario)
-//if err != nil {
-//log.Warningf(c, "Erro ao buscar Usuario pelo email: %#v", err)
-//return nil
-//}
-//usuario.Email = email
-//return &usuario
-//}
