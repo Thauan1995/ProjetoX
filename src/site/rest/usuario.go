@@ -33,6 +33,31 @@ func RegistraUsuarioHandler(w http.ResponseWriter, r *http.Request) {
 	log.Warningf(c, "Método não permitido")
 	utils.RespondWithError(w, http.StatusMethodNotAllowed, 0, "Método não permitido")
 }
+
+func AtualizaUsuarioHandler(w http.ResponseWriter, r *http.Request) {
+	c := r.Context()
+
+	if r.Method == http.MethodPut {
+		AtualizaUsuario(w, r)
+		return
+	}
+
+	log.Warningf(c, "Método não permitido")
+	utils.RespondWithError(w, http.StatusMethodNotAllowed, 0, "Método não permitido ")
+}
+
+func DeletaUsuarioHandler(w http.ResponseWriter, r *http.Request) {
+	c := r.Context()
+
+	if r.Method == http.MethodDelete {
+		DeletaUsuario(w, r)
+		return
+	}
+
+	log.Warningf(c, "Método não permitido")
+	utils.RespondWithError(w, http.StatusMethodNotAllowed, 0, "Método não permitido")
+}
+
 func BuscaUsuario(w http.ResponseWriter, r *http.Request) {
 	c := r.Context()
 	var (
@@ -64,6 +89,7 @@ func BuscaUsuario(w http.ResponseWriter, r *http.Request) {
 	log.Debugf(c, "Busca realizada com sucesso")
 	utils.RespondWithJSON(w, http.StatusOK, usuario)
 }
+
 func InsereUsuario(w http.ResponseWriter, r *http.Request) {
 	c := r.Context()
 
@@ -94,4 +120,62 @@ func InsereUsuario(w http.ResponseWriter, r *http.Request) {
 	}
 	log.Debugf(c, "Usuario inserido com sucesso")
 	utils.RespondWithJSON(w, http.StatusOK, "Usuario Inserido com sucesso")
+}
+
+func AtualizaUsuario(w http.ResponseWriter, r *http.Request) {
+	c := r.Context()
+
+	var usu usuario.Usuario
+
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		log.Warningf(c, "Erro ao receber body de usuario: %v", err)
+		utils.RespondWithError(w, http.StatusBadRequest, 0, "Erro ao receber body de usuario")
+		return
+	}
+
+	err = json.Unmarshal(body, &usu)
+	if err != nil {
+		log.Warningf(c, "Falha ao fazer unmarshal de usuario %v", err)
+		utils.RespondWithError(w, http.StatusBadRequest, 0, "Falha ao fazer unmarshal de usuario")
+		return
+	}
+
+	err = usuario.AtualizarUsuario(c, usu)
+	if err != nil {
+		log.Warningf(c, "Erro ao atualizar usuario %v", err)
+		utils.RespondWithError(w, http.StatusBadRequest, 0, "Erro ao atualizar usuario")
+		return
+	}
+
+	log.Debugf(c, "Usuario atualizado com sucesso")
+	utils.RespondWithJSON(w, http.StatusOK, "Usuario atualizado com sucesso")
+}
+
+func DeletaUsuario(w http.ResponseWriter, r *http.Request) {
+	c := r.Context()
+
+	var usu usuario.Usuario
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		log.Warningf(c, "Erro ao receber body de usuario")
+		utils.RespondWithError(w, http.StatusBadRequest, 0, "Erro ao receber body de usuario")
+		return
+	}
+
+	if err = json.Unmarshal(body, &usu); err != nil {
+		log.Warningf(c, "Erro ao realizar unmarshal do usuario %v", err)
+		utils.RespondWithError(w, http.StatusBadRequest, 0, "Erro ao realizar unmarshal do usuario")
+		return
+	}
+
+	err = usuario.DeletarUsuario(c, usu)
+	if err != nil {
+		log.Warningf(c, "Falha ao deletar usuario")
+		utils.RespondWithError(w, http.StatusBadRequest, 0, "Falha ao deletar usuario")
+		return
+	}
+
+	log.Warningf(c, "Usuario deletado")
+	utils.RespondWithJSON(w, http.StatusOK, "Usuario deletado")
 }

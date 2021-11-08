@@ -17,6 +17,8 @@ func main() {
 	r.HandleFunc("/usuario/buscar", rest.BuscaUsuarioHandler)
 	r.HandleFunc("/usuario/registrar", rest.RegistraUsuarioHandler)
 	r.HandleFunc("/usuario/login", rest.LoginHandler)
+	r.HandleFunc("/usuario/atualizar", rest.AtualizaUsuarioHandler)
+	r.HandleFunc("/usuario/deletar", rest.DeletaUsuarioHandler)
 
 	//Config
 	r.HandleFunc("/config", rest.ConfigHandler)
