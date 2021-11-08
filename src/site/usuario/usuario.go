@@ -244,6 +244,23 @@ func AtualizarUsuario(c context.Context, usuario Usuario) error {
 	return PutUsuario(c, &usuario)
 }
 
+func DeletarUsuario(c context.Context, usuario Usuario) error {
+	datastoreClient, err := datastore.NewClient(c, consts.IDProjeto)
+	if err != nil {
+		log.Warningf(c, "Falha ao conectar-se com o datastore")
+		return err
+	}
+	defer datastoreClient.Close()
+
+	key := datastore.IDKey(KindUsuario, usuario.ID, nil)
+	if err = datastoreClient.Delete(c, key); err != nil {
+		log.Warningf(c, "Erro ao deletar usuario no datastore")
+		return err
+	}
+
+	return nil
+}
+
 func GetErro(code int) string {
 	switch code {
 	case ErrUsuarioInvalido:
