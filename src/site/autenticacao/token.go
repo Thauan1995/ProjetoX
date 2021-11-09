@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"site/config"
 	"site/utils/log"
+	"strconv"
 	"strings"
 	"time"
 
@@ -27,10 +28,9 @@ func CriarToken(c context.Context, usuarioID int64) (string, error) {
 func ValidarToken(r *http.Request) error {
 	c := r.Context()
 	tokenString := extrairToken(r)
-
 	token, err := jwt.Parse(tokenString, retornaChaveVerificacao)
 	if err != nil {
-		log.Warningf(c, "Erro ao fazer o Parse do token: %v", err)
+		log.Warningf(c, "Erro ao fazer o Parse do jwt token: %v", err)
 		return err
 	}
 
@@ -39,6 +39,28 @@ func ValidarToken(r *http.Request) error {
 	}
 	log.Warningf(c, "Token inválido")
 	return fmt.Errorf("Token inválido")
+}
+
+// ExtarUsuarioID retorna o usuarioID que está salvo no token
+func ExtrairUsuarioID(r *http.Request) (int64, error) {
+	c := r.Context()
+	tokenString := extrairToken(r)
+	token, err := jwt.Parse(tokenString, retornaChaveVerificacao)
+	if err != nil {
+		log.Warningf(c, "Erro ao fazer o Parse do jwt token")
+		return 0, err
+	}
+
+	if permissoes, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+		usuarioID, err := strconv.ParseInt(fmt.Sprintf("%.0f", permissoes["usuarioId"]), 10, 64)
+		if err != nil {
+			log.Warningf(c, "Erro ao converter usuario id para int64 %v", err)
+			return 0, nil
+		}
+		return usuarioID, nil
+	}
+
+	return 0, fmt.Errorf("Token inválido")
 }
 
 func extrairToken(r *http.Request) string {

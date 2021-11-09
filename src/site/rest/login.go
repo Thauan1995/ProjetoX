@@ -48,8 +48,8 @@ func AcessarUsuario(w http.ResponseWriter, r *http.Request) {
 	for _, usu := range usuarioBanco {
 		err = seguranca.VerifcarSenha(usu.Senha, usuarioLogin.Senha)
 		if err != nil {
-			log.Warningf(c, "Senha inserida no login não compativel com a cadastrada no banco: %v", err)
-			utils.RespondWithError(w, http.StatusBadRequest, 0, "Senha inserida no login não compativel com a cadastrada no banco")
+			log.Warningf(c, "Senha inválida: %v", err)
+			utils.RespondWithError(w, http.StatusBadRequest, 0, "Senha inválida")
 			return
 		}
 		token, err := autenticacao.CriarToken(c, usu.ID)

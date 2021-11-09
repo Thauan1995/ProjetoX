@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
+	"site/autenticacao"
 	"site/usuario"
 	"site/utils"
 	"site/utils/log"
@@ -127,6 +128,13 @@ func AtualizaUsuario(w http.ResponseWriter, r *http.Request) {
 
 	var usu usuario.Usuario
 
+	usuarioIDNoToken, err := autenticacao.ExtrairUsuarioID(r)
+	if err != nil {
+		log.Warningf(c, "Erro ao estrair token do usuario da requisição %v", err)
+		utils.RespondWithError(w, http.StatusBadRequest, 0, "Erro ao extrair token do usuario da requisição")
+		return
+	}
+
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		log.Warningf(c, "Erro ao receber body de usuario: %v", err)
@@ -138,6 +146,14 @@ func AtualizaUsuario(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Warningf(c, "Falha ao fazer unmarshal de usuario %v", err)
 		utils.RespondWithError(w, http.StatusBadRequest, 0, "Falha ao fazer unmarshal de usuario")
+		return
+	}
+
+	log.Infof(c, "Usuario preenchido %v", usu)
+
+	if usu.ID != usuarioIDNoToken {
+		log.Warningf(c, "Usuario não tem autorizaçao para fazer essa ação")
+		utils.RespondWithError(w, http.StatusForbidden, 0, "Usuario não tem autorização para fazer essa ação")
 		return
 	}
 
