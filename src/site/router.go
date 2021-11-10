@@ -15,11 +15,11 @@ func main() {
 	r := router.PathPrefix("/api").Subrouter()
 
 	//Usuario
-	r.HandleFunc("/usuario/buscar", middlewares.Autenticar(rest.BuscaUsuarioHandler))
 	r.HandleFunc("/usuario/registrar", rest.RegistraUsuarioHandler)
 	r.HandleFunc("/usuario/login", rest.LoginHandler)
-	r.HandleFunc("/usuario/atualizar", rest.AtualizaUsuarioHandler)
-	r.HandleFunc("/usuario/deletar", rest.DeletaUsuarioHandler)
+	r.HandleFunc("/usuario/buscar", middlewares.Autenticar(rest.BuscaUsuarioHandler))
+	r.HandleFunc("/usuario/atualizar", middlewares.Autenticar(rest.AtualizaUsuarioHandler))
+	r.HandleFunc("/usuario/deletar", middlewares.Autenticar(rest.DeletaUsuarioHandler))
 
 	//Config
 	r.HandleFunc("/config", rest.ConfigHandler)

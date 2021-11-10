@@ -130,7 +130,7 @@ func AtualizaUsuario(w http.ResponseWriter, r *http.Request) {
 
 	usuarioIDNoToken, err := autenticacao.ExtrairUsuarioID(r)
 	if err != nil {
-		log.Warningf(c, "Erro ao estrair token do usuario da requisição %v", err)
+		log.Warningf(c, "Erro ao extrair token do usuario da requisição %v", err)
 		utils.RespondWithError(w, http.StatusBadRequest, 0, "Erro ao extrair token do usuario da requisição")
 		return
 	}
@@ -148,8 +148,6 @@ func AtualizaUsuario(w http.ResponseWriter, r *http.Request) {
 		utils.RespondWithError(w, http.StatusBadRequest, 0, "Falha ao fazer unmarshal de usuario")
 		return
 	}
-
-	log.Infof(c, "Usuario preenchido %v", usu)
 
 	if usu.ID != usuarioIDNoToken {
 		log.Warningf(c, "Usuario não tem autorizaçao para fazer essa ação")
@@ -172,6 +170,14 @@ func DeletaUsuario(w http.ResponseWriter, r *http.Request) {
 	c := r.Context()
 
 	var usu usuario.Usuario
+
+	usuarioIDNoToken, err := autenticacao.ExtrairUsuarioID(r)
+	if err != nil {
+		log.Warningf(c, "Erro ao extrair id do usuario da requisição %v", err)
+		utils.RespondWithError(w, http.StatusBadRequest, 0, "Erro ao extrair id do usuario da requisição")
+		return
+	}
+
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		log.Warningf(c, "Erro ao receber body de usuario")
@@ -182,6 +188,12 @@ func DeletaUsuario(w http.ResponseWriter, r *http.Request) {
 	if err = json.Unmarshal(body, &usu); err != nil {
 		log.Warningf(c, "Erro ao realizar unmarshal do usuario %v", err)
 		utils.RespondWithError(w, http.StatusBadRequest, 0, "Erro ao realizar unmarshal do usuario")
+		return
+	}
+
+	if usu.ID != usuarioIDNoToken {
+		log.Warningf(c, "Usuario não tem autenticação para fazer essa ação")
+		utils.RespondWithError(w, http.StatusForbidden, 0, "Usuario não tem autenticação para fazer essa ação")
 		return
 	}
 
