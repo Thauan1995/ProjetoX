@@ -109,14 +109,11 @@ func InserirSeguidor(c context.Context, seguidor *Seguidor) error {
 func Seguir(c context.Context, usuarioID, seguidorID int64) error {
 	var seguidor Seguidor
 	seguidorBanco := GetSeguidorByIDSeguidor(c, seguidorID)
-	//usuarioBanco := usuario.GetUsuario(c, usuarioID)
 
 	if seguidorBanco == nil {
 		seguidor.IDUsuario = append(seguidor.IDUsuario, usuarioID)
 
 	} else {
-		log.Infof(c, "Seguidor no Banco %v", seguidorBanco)
-		log.Infof(c, "IDUsuario do seguidorBanco %v", seguidorBanco.IDUsuario)
 		for _, v := range seguidorBanco.IDUsuario {
 			if v == usuarioID {
 				log.Warningf(c, "Usuario ja está sendo seguido")
