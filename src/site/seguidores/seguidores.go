@@ -131,3 +131,23 @@ func Seguir(c context.Context, usuarioID, seguidorID int64) error {
 	}
 	return nil
 }
+
+func PararDeSeguir(c context.Context, usuarioID, seguidorID int64) error {
+	seguidorBanco := GetSeguidorByIDSeguidor(c, seguidorID)
+
+	var usuariosAtt []int64
+	for _, v := range seguidorBanco.IDUsuario {
+		if v != usuarioID {
+			usuariosAtt = append(usuariosAtt, v)
+		}
+	}
+
+	seguidorBanco.IDSeguidor = seguidorID
+	seguidorBanco.IDUsuario = append(seguidorBanco.IDUsuario, usuariosAtt...)
+
+	if err := InserirSeguidor(c, seguidorBanco); err != nil {
+		log.Warningf(c, "Erro na inserção do seguidor atualizado: %v", err)
+		return fmt.Errorf("Erro na inserção do seguidor atualizado")
+	}
+	return nil
+}

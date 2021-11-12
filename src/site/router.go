@@ -21,6 +21,7 @@ func main() {
 	r.HandleFunc("/usuario/atualizar", middlewares.Autenticar(rest.AtualizaUsuarioHandler))
 	r.HandleFunc("/usuario/deletar", middlewares.Autenticar(rest.DeletaUsuarioHandler))
 	r.HandleFunc("/usuario/seguir", middlewares.Autenticar(rest.SeguidorHandler))
+	r.HandleFunc("/usuario/unseguir", middlewares.Autenticar(rest.SeguidorHandler))
 
 	//Config
 	r.HandleFunc("/config", rest.ConfigHandler)

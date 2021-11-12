@@ -72,6 +72,11 @@ func SeguidorHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if r.Method == http.MethodPut {
+		UnSeguirUsuarios(w, r)
+		return
+	}
+
 	log.Warningf(c, "Método não permitido")
 	utils.RespondWithError(w, http.StatusMethodNotAllowed, 0, "Método não permitido")
 	return
@@ -265,5 +270,46 @@ func SeguirUsuario(w http.ResponseWriter, r *http.Request) {
 
 	log.Debugf(c, "Usuario seguido com sucesso")
 	utils.RespondWithJSON(w, http.StatusOK, "Usuario seguido com sucesso")
+	return
+}
+
+func UnSeguirUsuarios(w http.ResponseWriter, r *http.Request) {
+	c := r.Context()
+	var usu usuario.Usuario
+
+	seguidorID, err := autenticacao.ExtrairUsuarioID(r)
+	if err != nil {
+		log.Warningf(c, "Erro ao extrair token do usuario: %v", err)
+		utils.RespondWithError(w, http.StatusBadRequest, 0, "Erro ao extrair token do usuario")
+		return
+	}
+
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		log.Warningf(c, "Erro ao receber body de usuario: %v", err)
+		utils.RespondWithError(w, http.StatusBadRequest, 0, "Erro ao receber body de usuario")
+		return
+	}
+
+	if err = json.Unmarshal(body, &usu); err != nil {
+		log.Warningf(c, "Falha ao fazer unmarshal do usuario a ser seguido: %v", err)
+		utils.RespondWithError(w, http.StatusBadRequest, 0, "Falha ao fazer unmarshal do usuario a ser seguido")
+		return
+	}
+
+	if seguidorID == usu.ID {
+		log.Warningf(c, "Não é possivel parar de seguir você mesmo")
+		utils.RespondWithError(w, http.StatusForbidden, 0, "Não é possivel parar de seguir você mesmo")
+		return
+	}
+
+	if err = seguidores.PararDeSeguir(c, usu.ID, seguidorID); err != nil {
+		log.Warningf(c, "Erro ao parar de seguir usuario %v", err)
+		utils.RespondWithError(w, http.StatusBadRequest, 0, "Erro ao parar de seguir usuario")
+		return
+	}
+
+	log.Debugf(c, "Sucesso em parar de seguir usuario")
+	utils.RespondWithJSON(w, http.StatusOK, "Sucesso em parar de seguit usuario")
 	return
 }
