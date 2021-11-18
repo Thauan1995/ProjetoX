@@ -3,6 +3,7 @@ package seguidores
 import (
 	"context"
 	"fmt"
+	"site/usuario"
 	"site/utils"
 	"site/utils/consts"
 	"site/utils/log"
@@ -39,6 +40,31 @@ func GetSeguidorByIDSeguidor(c context.Context, idSeguidor int64) *Seguidor {
 	seguidor.IDSeguidor = idSeguidor
 	return &seguidor
 }
+func GetMultSeguidor(c context.Context, keys []*datastore.Key) ([]Seguidor, error) {
+	datastoreClient, err := datastore.NewClient(c, consts.IDProjeto)
+	if err != nil {
+		log.Warningf(c, "Falha ao conectar-se com o Datastore: %v", err)
+		return []Seguidor{}, err
+	}
+	defer datastoreClient.Close()
+
+	seguidores := make([]Seguidor, len(keys))
+	if err := datastoreClient.GetMulti(c, keys, seguidores); err != nil {
+		if errs, ok := err.(datastore.MultiError); ok {
+			for _, e := range errs {
+				if e == datastore.ErrNoSuchEntity {
+					return []Seguidor{}, nil
+				}
+			}
+		}
+		log.Warningf(c, "Erro ao buscar Multi Seguidors: %v", err)
+		return []Seguidor{}, err
+	}
+	for i := range keys {
+		seguidores[i].IDSeguidor = keys[i].ID
+	}
+	return seguidores, nil
+}
 
 func PutSeguidor(c context.Context, seguidor *Seguidor) error {
 	datastoreClient, err := datastore.NewClient(c, consts.IDProjeto)
@@ -58,11 +84,11 @@ func PutSeguidor(c context.Context, seguidor *Seguidor) error {
 	return nil
 }
 
-func FiltrarSeguidores(c context.Context, filtro Seguidor) []*datastore.Key {
+func FiltrarSeguidores(c context.Context, filtro Seguidor) ([]Seguidor, error) {
 	datastoreClient, err := datastore.NewClient(c, consts.IDProjeto)
 	if err != nil {
 		log.Warningf(c, "Erro ao conectar-se com o Datastore: %v", err)
-		return nil
+		return nil, err
 	}
 	defer datastoreClient.Close()
 
@@ -73,13 +99,13 @@ func FiltrarSeguidores(c context.Context, filtro Seguidor) []*datastore.Key {
 		q = q.Filter("__key__ =", key)
 	}
 
-	q = q.Order("IDSeguidor").KeysOnly()
+	q = q.KeysOnly()
 	keys, err := datastoreClient.GetAll(c, q, nil)
 	if err != nil {
 		log.Warningf(c, "Erro ao buscar Seguidor: %v", err)
-		return nil
+		return nil, err
 	}
-	return keys
+	return GetMultSeguidor(c, keys)
 }
 
 func InserirSeguidor(c context.Context, seguidor *Seguidor) error {
@@ -97,8 +123,12 @@ func InserirSeguidor(c context.Context, seguidor *Seguidor) error {
 		seguidor.DataCriacao = utils.GetSpecialTimeNow()
 	}
 
-	keysSeguidor := FiltrarSeguidores(c, *seguidor)
-	if len(keysSeguidor) > 0 && seguidor.IDSeguidor != keysSeguidor[0].ID {
+	keysSeguidor, err := FiltrarSeguidores(c, *seguidor)
+	if err != nil {
+		log.Warningf(c, "Erro ao filtrar seguidores %v", err)
+		return err
+	}
+	if len(keysSeguidor) > 0 && seguidor.IDSeguidor != keysSeguidor[0].IDSeguidor {
 		log.Debugf(c, "Seguidor ja existe %#v", seguidor)
 		return nil
 	}
@@ -142,12 +172,57 @@ func PararDeSeguir(c context.Context, usuarioID, seguidorID int64) error {
 		}
 	}
 
+	if len(usuariosAtt) < 1 {
+		usuariosAtt = []int64{0}
+	}
+
 	seguidorBanco.IDSeguidor = seguidorID
-	seguidorBanco.IDUsuario = append(seguidorBanco.IDUsuario, usuariosAtt...)
+	seguidorBanco.IDUsuario = usuariosAtt
 
 	if err := InserirSeguidor(c, seguidorBanco); err != nil {
 		log.Warningf(c, "Erro na inserção do seguidor atualizado: %v", err)
 		return fmt.Errorf("Erro na inserção do seguidor atualizado")
 	}
 	return nil
+}
+
+func BuscarUsuariosSeguidos(c context.Context, seguidorID int64) ([]usuario.Usuario, error) {
+	var usuarios []usuario.Usuario
+	seguidorBanco := GetSeguidorByIDSeguidor(c, seguidorID)
+
+	for _, v := range seguidorBanco.IDUsuario {
+		if v == 0 {
+			continue
+		}
+		usu := usuario.GetUsuario(c, v)
+		usuarios = append(usuarios, usuario.Usuario{
+			ID:          usu.ID,
+			Nome:        usu.Nome,
+			Nick:        usu.Nick,
+			Email:       usu.Email,
+			DataCriacao: usu.DataCriacao,
+		})
+
+	}
+	return usuarios, nil
+}
+
+func BuscarSeguidores(c context.Context, seguidores []Seguidor, usuarioID int64) ([]usuario.Usuario, error) {
+	var usuarios []usuario.Usuario
+
+	for _, v := range seguidores {
+		for _, x := range v.IDUsuario {
+			if x == usuarioID {
+				usu := usuario.GetUsuario(c, v.IDSeguidor)
+				usuarios = append(usuarios, usuario.Usuario{
+					ID:          usu.ID,
+					Nome:        usu.Nome,
+					Nick:        usu.Nick,
+					Email:       usu.Email,
+					DataCriacao: usu.DataCriacao,
+				})
+			}
+		}
+	}
+	return usuarios, nil
 }

@@ -82,6 +82,32 @@ func SeguidorHandler(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
+func BuscaUsuariosSeguidosHandler(w http.ResponseWriter, r *http.Request) {
+	c := r.Context()
+
+	if r.Method == http.MethodGet {
+		BuscaUsuariosSeguidos(w, r)
+		return
+	}
+
+	log.Warningf(c, "Método não permitido")
+	utils.RespondWithError(w, http.StatusMethodNotAllowed, 0, "Método não permitido")
+	return
+}
+
+func BuscaSeguidoresHandler(w http.ResponseWriter, r *http.Request) {
+	c := r.Context()
+
+	if r.Method == http.MethodGet {
+		BuscaSeguidores(w, r)
+		return
+	}
+
+	log.Warningf(c, "Método não permitido")
+	utils.RespondWithError(w, http.StatusMethodNotAllowed, 0, "Método não permitido")
+	return
+}
+
 func BuscaUsuario(w http.ResponseWriter, r *http.Request) {
 	c := r.Context()
 	var (
@@ -310,6 +336,76 @@ func UnSeguirUsuarios(w http.ResponseWriter, r *http.Request) {
 	}
 
 	log.Debugf(c, "Sucesso em parar de seguir usuario")
-	utils.RespondWithJSON(w, http.StatusOK, "Sucesso em parar de seguit usuario")
+	utils.RespondWithJSON(w, http.StatusOK, "Sucesso em parar de seguir usuario")
+	return
+}
+
+// Traz todas as pessoas que o usuario esta seguindo
+func BuscaUsuariosSeguidos(w http.ResponseWriter, r *http.Request) {
+	c := r.Context()
+	var (
+		id  int64
+		err error
+	)
+
+	if r.FormValue("ID") != "" {
+		id, err = strconv.ParseInt(r.FormValue("ID"), 10, 64)
+		if err != nil {
+			log.Warningf(c, "Erro ao converter ID: %v", err)
+			utils.RespondWithError(w, http.StatusBadRequest, 0, "Erro ao converter ID")
+			return
+		}
+	}
+
+	filtro := usuario.Usuario{
+		ID: id,
+	}
+
+	usuarios, err := seguidores.BuscarUsuariosSeguidos(c, filtro.ID)
+	if err != nil {
+		log.Warningf(c, "Erro ao efetuar a busca de usuarios %v", err)
+		utils.RespondWithError(w, http.StatusBadRequest, 0, "Erro ao efetuar a busca de usuarios")
+		return
+	}
+
+	utils.RespondWithJSON(w, http.StatusOK, usuarios)
+	return
+
+}
+
+// Traz todas as pessoas que seguem o usuario
+func BuscaSeguidores(w http.ResponseWriter, r *http.Request) {
+	c := r.Context()
+	var (
+		idusuario int64
+		err       error
+	)
+
+	if r.FormValue("ID") != "" {
+		idusuario, err = strconv.ParseInt(r.FormValue("ID"), 10, 64)
+		if err != nil {
+			log.Warningf(c, "Erro ao converter ID: %v", err)
+			utils.RespondWithError(w, http.StatusBadRequest, 0, "Erro ao converter ID")
+			return
+		}
+	}
+
+	filtro := seguidores.Seguidor{}
+
+	seguidors, err := seguidores.FiltrarSeguidores(c, filtro)
+	if err != nil {
+		log.Warningf(c, "Erro ao filtrar seguidores %v", err)
+		utils.RespondWithError(w, http.StatusBadRequest, 0, "Erro ao filtrar seguidor")
+		return
+	}
+
+	usuarios, err := seguidores.BuscarSeguidores(c, seguidors, idusuario)
+	if err != nil {
+		log.Warningf(c, "Erro ao efetuar busca de seguidores %v", err)
+		utils.RespondWithError(w, http.StatusBadRequest, 0, "Erro ao efetuar busca de seguidores")
+		return
+	}
+
+	utils.RespondWithJSON(w, http.StatusOK, usuarios)
 	return
 }
