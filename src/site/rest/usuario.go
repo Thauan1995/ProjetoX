@@ -6,10 +6,13 @@ import (
 	"net/http"
 	"site/autenticacao"
 	"site/seguidores"
+	"site/seguranca"
 	"site/usuario"
 	"site/utils"
 	"site/utils/log"
 	"strconv"
+
+	"github.com/gorilla/mux"
 )
 
 func BuscaUsuarioHandler(w http.ResponseWriter, r *http.Request) {
@@ -43,6 +46,11 @@ func AtualizaUsuarioHandler(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method == http.MethodPut {
 		AtualizaUsuario(w, r)
+		return
+	}
+
+	if r.Method == http.MethodPost {
+		AtualizaSenha(w, r)
 		return
 	}
 
@@ -299,6 +307,7 @@ func SeguirUsuario(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
+//Permite que um usuario pare de seguir outro
 func UnSeguirUsuarios(w http.ResponseWriter, r *http.Request) {
 	c := r.Context()
 	var usu usuario.Usuario
@@ -407,5 +416,69 @@ func BuscaSeguidores(w http.ResponseWriter, r *http.Request) {
 	}
 
 	utils.RespondWithJSON(w, http.StatusOK, usuarios)
+	return
+}
+
+// Permite alterar a senha do usuario
+func AtualizaSenha(w http.ResponseWriter, r *http.Request) {
+	c := r.Context()
+	usuarioID, err := autenticacao.ExtrairUsuarioID(r)
+	if err != nil {
+		log.Warningf(c, "Erro ao extrair ID do usuario da requisição %v", err)
+		utils.RespondWithError(w, http.StatusBadRequest, 0, "Erro ao extrair ID do usuario da requisição")
+		return
+	}
+
+	params := mux.Vars(r)
+	id, err := strconv.ParseInt(params["id"], 10, 64)
+	if err != nil {
+		log.Warningf(c, "Falha ao converter id %v", err)
+		utils.RespondWithError(w, http.StatusBadRequest, 0, "Falha ao converter id")
+		return
+	}
+
+	if usuarioID != id {
+		log.Warningf(c, "Não é possivel atualizar a senha de um usuario que não seja o seu")
+		utils.RespondWithError(w, http.StatusForbidden, 0, "Não é possivel atualizar a senha de um usuario que não seja o seu")
+		return
+	}
+
+	corpoRequisicao, err := ioutil.ReadAll(r.Body)
+
+	var senha seguranca.Senha
+	if err = json.Unmarshal(corpoRequisicao, &senha); err != nil {
+		log.Warningf(c, "Falha ao realizar unmarshal da requisição para alterar senha %v", err)
+		utils.RespondWithError(w, http.StatusBadRequest, 0, "Falha ao realizar unmarshal da requisição para alterar senha")
+		return
+	}
+
+	senhaBanco, err := seguranca.BuscarSenha(c, usuarioID)
+	if err != nil {
+		log.Warningf(c, "Falha ao buscar senha do usuario no banco %v", err)
+		utils.RespondWithError(w, http.StatusBadRequest, 0, "Falha ao buscar senha do usuario no banco")
+		return
+	}
+
+	if err = seguranca.VerifcarSenha(senhaBanco, senha.Atual); err != nil {
+		log.Warningf(c, "A senha atual não condiz com a que está no banco %v", err)
+		utils.RespondWithError(w, http.StatusUnauthorized, 0, "A senha atual não condiz com a que está no banco")
+		return
+	}
+
+	senhaNovaHash, err := seguranca.Hash(senha.Nova)
+	if err != nil {
+		log.Warningf(c, "Falha ao criptografar nova senha %v", err)
+		utils.RespondWithError(w, http.StatusBadRequest, 0, "Falha ai criptografar nova senha")
+		return
+	}
+
+	if err = seguranca.AtualizarSenha(c, usuarioID, string(senhaNovaHash)); err != nil {
+		log.Warningf(c, "Erro ao atualizar senha %v", err)
+		utils.RespondWithError(w, http.StatusBadRequest, 0, "Erro ao atualizar senha")
+		return
+	}
+
+	log.Debugf(c, "Senha atualizada com sucesso")
+	utils.RespondWithJSON(w, http.StatusOK, "Senha atualizada com sucesso")
 	return
 }
