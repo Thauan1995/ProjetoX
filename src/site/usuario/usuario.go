@@ -227,9 +227,7 @@ func InserirUsuario(c context.Context, usuario *Usuario) error {
 }
 
 func AtualizarUsuario(c context.Context, usuario Usuario) error {
-	log.Infof(c, "Usuario: %v", usuario)
 	usuarioBanco := GetUsuario(c, usuario.ID)
-	log.Infof(c, "UsuarioBanco %v", usuarioBanco)
 
 	if err := usuario.Preparar("edicao"); err != nil {
 		log.Warningf(c, "Erro ao preparar usuario para edição %v", err)
