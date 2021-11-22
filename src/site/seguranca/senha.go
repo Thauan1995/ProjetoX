@@ -9,8 +9,8 @@ import (
 
 //Formato para alteração de senha
 type Senha struct {
-	Nova  string `json:"nova"`
-	Atual string `json:"atual"`
+	Nova  string
+	Atual string
 }
 
 func BuscarSenha(c context.Context, usuarioID int64) (string, error) {
