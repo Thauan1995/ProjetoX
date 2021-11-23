@@ -30,8 +30,9 @@ func main() {
 	r.HandleFunc("/config", rest.ConfigHandler)
 
 	//Publicação
-	r.HandleFunc("/publicacoes", middlewares.Autenticar(rest.PublicacaoHandler))
-	r.HandleFunc("/publicacoes/{id}", middlewares.Autenticar(rest.PublicacaoHandler))
+	r.HandleFunc("/publicacao", middlewares.Autenticar(rest.PublicacaoHandler))
+	r.HandleFunc("/publicacao/{id}", middlewares.Autenticar(rest.PublicacaoHandler))
+	r.HandleFunc("/publicacoes", middlewares.Autenticar(rest.PublicacoesHandler))
 
 	http.Handle("/", router)
 
