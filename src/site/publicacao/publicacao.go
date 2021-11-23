@@ -3,10 +3,12 @@ package publicacao
 import (
 	"context"
 	"fmt"
+	"site/seguidores"
 	"site/usuario"
 	"site/utils"
 	"site/utils/consts"
 	"site/utils/log"
+	"sort"
 	"strings"
 
 	"cloud.google.com/go/datastore"
@@ -86,4 +88,99 @@ func GetPublicacao(c context.Context, id int64) *Publicacao {
 	}
 	publicacao.ID = id
 	return &publicacao
+}
+
+func GetMultPublicacao(c context.Context, keys []*datastore.Key) ([]Publicacao, error) {
+	datastoreClient, err := datastore.NewClient(c, consts.IDProjeto)
+	if err != nil {
+		log.Warningf(c, "Falha ao conectar-se com o Datastore: %v", err)
+		return []Publicacao{}, err
+	}
+	defer datastoreClient.Close()
+
+	publicacao := make([]Publicacao, len(keys))
+	if err := datastoreClient.GetMulti(c, keys, publicacao); err != nil {
+		if errs, ok := err.(datastore.MultiError); ok {
+			for _, e := range errs {
+				if e == datastore.ErrNoSuchEntity {
+					return []Publicacao{}, nil
+				}
+			}
+		}
+		log.Warningf(c, "Erro ao buscar Multi Usuarios: %v", err)
+		return []Publicacao{}, err
+	}
+	for i := range keys {
+		publicacao[i].ID = keys[i].ID
+	}
+	return publicacao, nil
+}
+
+func FiltrarPublicacoes(c context.Context, publicacao Publicacao) ([]Publicacao, error) {
+	datastoreClient, err := datastore.NewClient(c, consts.IDProjeto)
+	if err != nil {
+		log.Warningf(c, "Falha ao conectar-se com o Datastore: %v", err)
+		return nil, err
+	}
+	defer datastoreClient.Close()
+
+	q := datastore.NewQuery(KindPublicacoes)
+
+	if publicacao.AutorNick != "" {
+		q = q.Filter("AutorNick =", publicacao.AutorNick)
+	}
+
+	if publicacao.AutorID != 0 {
+		q = q.Filter("AutorID =", publicacao.AutorID)
+	}
+
+	if publicacao.ID != 0 {
+		key := datastore.IDKey(KindPublicacoes, publicacao.ID, nil)
+		q = q.Filter("__key__ =", key)
+	}
+
+	q = q.KeysOnly()
+	keys, err := datastoreClient.GetAll(c, q, nil)
+	if err != nil {
+		log.Warningf(c, "Erro ao buscar Publicação")
+		return nil, err
+	}
+	return GetMultPublicacao(c, keys)
+}
+
+func Buscar(c context.Context, usuarioID int64) ([]Publicacao, error) {
+	var publicacao Publicacao
+
+	publicacao.AutorID = usuarioID
+
+	publics, err := FiltrarPublicacoes(c, publicacao)
+	if err != nil {
+		log.Warningf(c, "Erro ao filtrar publicações pelo usuarioID: %v", err)
+		return nil, err
+	}
+
+	seguidos, err := seguidores.BuscarUsuariosSeguidos(c, usuarioID)
+	if err != nil {
+		log.Warningf(c, "Erro ao buscar usuarios seguidos para perara busca de publicações %v", err)
+		return nil, err
+	}
+
+	for _, v := range seguidos {
+		publicacao.AutorID = v.ID
+		publicSeguidos, err := FiltrarPublicacoes(c, publicacao)
+		if err != nil {
+			log.Warningf(c, "Erro filtrar publicações pelo usuarioID dos seguidos: %v", err)
+			return nil, err
+		}
+		publics = append(publics, publicSeguidos...)
+
+	}
+
+	//ordenando publicações pela data mais recente
+	sort.Slice(publics, func(i, j int) bool {
+		return publics[i].DataCriacao.After(publics[j].DataCriacao.Time)
+	})
+
+	return publics, nil
+	// TODO: Corrigir erro de bad request ocorrido quando um usuario que não segue ngm efetua a busca de publicações
 }

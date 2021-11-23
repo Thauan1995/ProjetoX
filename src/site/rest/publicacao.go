@@ -30,6 +30,19 @@ func PublicacaoHandler(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
+func PublicacoesHandler(w http.ResponseWriter, r *http.Request) {
+	c := r.Context()
+
+	if r.Method == http.MethodGet {
+		BuscarPublicacoes(w, r)
+		return
+	}
+
+	log.Warningf(c, "Método não permitido")
+	utils.RespondWithError(w, http.StatusMethodNotAllowed, 0, "Método não permitido")
+	return
+}
+
 //Adiciona uma nova publicação
 func CriarPublicacao(w http.ResponseWriter, r *http.Request) {
 	c := r.Context()
@@ -67,7 +80,25 @@ func CriarPublicacao(w http.ResponseWriter, r *http.Request) {
 
 //Traz as publicações que apareceriam no feed do usuario
 func BuscarPublicacoes(w http.ResponseWriter, r *http.Request) {
+	c := r.Context()
 
+	usuarioID, err := autenticacao.ExtrairUsuarioID(r)
+	if err != nil {
+		log.Warningf(c, "Erro ao extrair token do usuario da requisição: %v", err)
+		utils.RespondWithError(w, http.StatusBadRequest, 0, "Erro ao extrair token do usuario da requisição")
+		return
+	}
+
+	publicacoes, err := publicacao.Buscar(c, usuarioID)
+	if err != nil {
+		log.Warningf(c, "Falha na busca das publicações: %v", err)
+		utils.RespondWithError(w, http.StatusBadRequest, 0, "Falha na busca das publicações")
+		return
+	}
+
+	log.Debugf(c, "Busca realizada com sucesso")
+	utils.RespondWithJSON(w, http.StatusOK, publicacoes)
+	return
 }
 
 //Traz uma unica publicação pelo nick
