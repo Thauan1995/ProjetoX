@@ -29,6 +29,10 @@ func main() {
 	//Config
 	r.HandleFunc("/config", rest.ConfigHandler)
 
+	//Publicação
+	r.HandleFunc("/publicacoes", middlewares.Autenticar(rest.PublicacaoHandler))
+	r.HandleFunc("/publicacoes/{id}", middlewares.Autenticar(rest.PublicacaoHandler))
+
 	http.Handle("/", router)
 
 	var port = os.Getenv("PORT")
