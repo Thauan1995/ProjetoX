@@ -54,6 +54,19 @@ func PublicacoesHandler(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
+func PublicacoesUsuarioHandler(w http.ResponseWriter, r *http.Request) {
+	c := r.Context()
+
+	if r.Method == http.MethodGet {
+		BuscarPublicacoesPorUsuario(w, r)
+		return
+	}
+
+	log.Warningf(c, "Método não permitido")
+	utils.RespondWithError(w, http.StatusMethodNotAllowed, 0, "Metodo não permitido")
+	return
+}
+
 //Adiciona uma nova publicação
 func CriarPublicacao(w http.ResponseWriter, r *http.Request) {
 	c := r.Context()
@@ -220,4 +233,27 @@ func DeletarPublicacao(w http.ResponseWriter, r *http.Request) {
 	utils.RespondWithJSON(w, http.StatusOK, "Publicação Excluida")
 	return
 
+}
+
+//Traz todas as publicações de um usario especifico
+func BuscarPublicacoesPorUsuario(w http.ResponseWriter, r *http.Request) {
+	c := r.Context()
+
+	params := mux.Vars(r)
+	usuarioID, err := strconv.ParseInt(params["usuarioId"], 10, 64)
+	if err != nil {
+		log.Warningf(c, "Erro na conversão do id do usuario: %v", err)
+		utils.RespondWithError(w, http.StatusBadRequest, 0, "Erro na conversão do id do usuario")
+		return
+	}
+
+	publics, err := publicacao.BuscarPorUsuario(c, usuarioID)
+	if err != nil {
+		log.Warningf(c, "Falha na busca das publicações do usuario %v, erro: %v", usuarioID, err)
+		utils.RespondWithError(w, http.StatusBadRequest, 0, "Falha na busca das publicações do usuario")
+	}
+
+	log.Debugf(c, "Busca realizada com sucesso")
+	utils.RespondWithJSON(w, http.StatusOK, publics)
+	return
 }
