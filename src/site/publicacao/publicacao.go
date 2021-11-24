@@ -214,3 +214,16 @@ func Deletar(c context.Context, publicacao Publicacao) error {
 	}
 	return nil
 }
+
+func BuscarPorUsuario(c context.Context, usuarioID int64) ([]Publicacao, error) {
+	var publicacao Publicacao
+	publicacao.AutorID = usuarioID
+
+	publics, err := FiltrarPublicacoes(c, publicacao)
+	if err != nil {
+		log.Warningf(c, "Erro ao filtrar publicações %v", err)
+		return nil, err
+	}
+
+	return publics, nil
+}

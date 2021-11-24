@@ -35,6 +35,7 @@ func main() {
 	r.HandleFunc("/publicacoes", middlewares.Autenticar(rest.PublicacoesHandler))
 	r.HandleFunc("/publicacoes/{idpublic}", middlewares.Autenticar(rest.PublicacaoHandler))
 	r.HandleFunc("/publicacoes/{idpublic}/deletar", middlewares.Autenticar(rest.PublicacaoHandler))
+	r.HandleFunc("/usuario/{usuarioId}/publicacoes", middlewares.Autenticar(rest.PublicacoesUsuarioHandler))
 
 	http.Handle("/", router)
 
