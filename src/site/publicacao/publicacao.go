@@ -227,3 +227,27 @@ func BuscarPorUsuario(c context.Context, usuarioID int64) ([]Publicacao, error) 
 
 	return publics, nil
 }
+
+func Curtir(c context.Context, publicacaoID int64) error {
+	public := GetPublicacao(c, publicacaoID)
+
+	public.Curtidas++
+
+	if err := Atualizar(c, *public); err != nil {
+		log.Warningf(c, "Erro ao atualizar curtida da publicação no banco: %v", err)
+		return err
+	}
+	return nil
+}
+
+func Descurtir(c context.Context, publicacaoID int64) error {
+	public := GetPublicacao(c, publicacaoID)
+
+	public.Curtidas--
+
+	if err := Atualizar(c, *public); err != nil {
+		log.Warningf(c, "Erro ao atualizar descurtida da publicação no banco: %v", err)
+		return err
+	}
+	return nil
+}

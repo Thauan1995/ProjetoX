@@ -49,6 +49,16 @@ func PublicacoesHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if r.Method == http.MethodPost {
+		CurtirPublicacao(w, r)
+		return
+	}
+
+	if r.Method == http.MethodPut {
+		DescurtiPublicacao(w, r)
+		return
+	}
+
 	log.Warningf(c, "Método não permitido")
 	utils.RespondWithError(w, http.StatusMethodNotAllowed, 0, "Método não permitido")
 	return
@@ -255,5 +265,50 @@ func BuscarPublicacoesPorUsuario(w http.ResponseWriter, r *http.Request) {
 
 	log.Debugf(c, "Busca realizada com sucesso")
 	utils.RespondWithJSON(w, http.StatusOK, publics)
+	return
+}
+
+//Adiciona uma curtida na publicação
+func CurtirPublicacao(w http.ResponseWriter, r *http.Request) {
+	c := r.Context()
+
+	params := mux.Vars(r)
+	publicacaoID, err := strconv.ParseInt(params["idpublic"], 10, 64)
+	if err != nil {
+		log.Warningf(c, "Erro ao converter id da publicação %v", err)
+		utils.RespondWithError(w, http.StatusBadRequest, 0, "Erro ao converter id da publicação")
+		return
+	}
+
+	if err := publicacao.Curtir(c, publicacaoID); err != nil {
+		log.Warningf(c, "Erro ao curtir publicação: %v", err)
+		utils.RespondWithError(w, http.StatusBadRequest, 0, "Erro ao curtir publicação")
+		return
+	}
+
+	log.Debugf(c, "Publicação curtida")
+	utils.RespondWithJSON(w, http.StatusOK, "Publicação curtida")
+	return
+}
+
+func DescurtiPublicacao(w http.ResponseWriter, r *http.Request) {
+	c := r.Context()
+
+	params := mux.Vars(r)
+	publicacaoID, err := strconv.ParseInt(params["idpublic"], 10, 64)
+	if err != nil {
+		log.Warningf(c, "Erro ao converter id da publicação: %v", err)
+		utils.RespondWithError(w, http.StatusBadRequest, 0, "Erro ao converter id da publicação")
+		return
+	}
+
+	if err := publicacao.Descurtir(c, publicacaoID); err != nil {
+		log.Warningf(c, "Erro ao descurtir a publicação: %v", err)
+		utils.RespondWithError(w, http.StatusBadRequest, 0, "Erro ao descurtir a publicação")
+		return
+	}
+
+	log.Debugf(c, "Publicação descurtida")
+	utils.RespondWithJSON(w, http.StatusOK, "Publicação descurtida")
 	return
 }
