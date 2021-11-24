@@ -184,3 +184,17 @@ func Buscar(c context.Context, usuarioID int64) ([]Publicacao, error) {
 	return publics, nil
 	// TODO: Corrigir erro de bad request ocorrido quando um usuario que não segue ngm efetua a busca de publicações
 }
+
+func Atualizar(c context.Context, publicacao Publicacao) error {
+	publicBanco := GetPublicacao(c, publicacao.ID)
+
+	publicBanco.Titulo = publicacao.Titulo
+	publicBanco.Conteudo = publicacao.Conteudo
+
+	publicacao.AutorID = publicBanco.AutorID
+	publicacao.AutorNick = publicBanco.AutorNick
+
+	publicacao.DataCriacao = utils.GetSpecialTimeNow()
+
+	return PutPublicacao(c, &publicacao)
+}

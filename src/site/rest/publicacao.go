@@ -24,6 +24,10 @@ func PublicacaoHandler(w http.ResponseWriter, r *http.Request) {
 		BuscarPublicacao(w, r)
 		return
 	}
+	if r.Method == http.MethodPut {
+		AtualizarPublicacao(w, r)
+		return
+	}
 
 	log.Warningf(c, "Método não permitido")
 	utils.RespondWithError(w, http.StatusMethodNotAllowed, 0, "Método não permitido")
@@ -122,7 +126,56 @@ func BuscarPublicacao(w http.ResponseWriter, r *http.Request) {
 
 //Altera os dados de uma publicação
 func AtualizarPublicacao(w http.ResponseWriter, r *http.Request) {
+	c := r.Context()
 
+	params := mux.Vars(r)
+	idPublic, err := strconv.ParseInt(params["idpublic"], 10, 64)
+	if err != nil {
+		log.Warningf(c, "Falha ao converter id da publicação: %v", err)
+		utils.RespondWithError(w, http.StatusBadRequest, 0, "Falha ao converter id da publicação")
+		return
+	}
+
+	usuarioID, err := autenticacao.ExtrairUsuarioID(r)
+	if err != nil {
+		log.Warningf(c, "Erro ao extrair id so usuario da requisição: %v", err)
+		utils.RespondWithError(w, http.StatusBadRequest, 0, "Erro ao extrair id do usuario da requisição")
+		return
+	}
+
+	publicacaoBanco := publicacao.GetPublicacao(c, idPublic)
+
+	if publicacaoBanco.AutorID != usuarioID {
+		log.Warningf(c, "Não é possivel atualizar uma publicação que não seja sua: %v", err)
+		utils.RespondWithError(w, http.StatusForbidden, 0, "Não é possivel atualizar uma publicação que não seja sua")
+		return
+	}
+
+	corpoRequisicao, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		log.Warningf(c, "Falha ao receber body da requisição %v", err)
+		utils.RespondWithError(w, http.StatusBadRequest, 0, "Falha ao receber body da requisição")
+		return
+	}
+
+	var public publicacao.Publicacao
+	public.ID = idPublic
+
+	if err := json.Unmarshal(corpoRequisicao, &public); err != nil {
+		log.Warningf(c, "Falha ao realizar unmarshal do corpo da requisição: %v", err)
+		utils.RespondWithError(w, http.StatusBadRequest, 0, "Falha ao realizar unmarshal do corpo da requisição")
+		return
+	}
+
+	if err = publicacao.Atualizar(c, public); err != nil {
+		log.Warningf(c, "Falha na edição da publicação: %v", err)
+		utils.RespondWithError(w, http.StatusBadRequest, 0, "Falha na edição da publicação")
+		return
+	}
+
+	log.Debugf(c, "Publicação atualizada com sucesso")
+	utils.RespondWithJSON(w, http.StatusOK, "Publicação atualizada com sucesso")
+	return
 }
 
 //Exclui uma publicação
