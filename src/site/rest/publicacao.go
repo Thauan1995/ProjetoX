@@ -20,12 +20,19 @@ func PublicacaoHandler(w http.ResponseWriter, r *http.Request) {
 		CriarPublicacao(w, r)
 		return
 	}
+
 	if r.Method == http.MethodGet {
 		BuscarPublicacao(w, r)
 		return
 	}
+
 	if r.Method == http.MethodPut {
 		AtualizarPublicacao(w, r)
+		return
+	}
+
+	if r.Method == http.MethodDelete {
+		DeletarPublicacao(w, r)
 		return
 	}
 
@@ -180,5 +187,37 @@ func AtualizarPublicacao(w http.ResponseWriter, r *http.Request) {
 
 //Exclui uma publicação
 func DeletarPublicacao(w http.ResponseWriter, r *http.Request) {
+	c := r.Context()
+
+	params := mux.Vars(r)
+	idPublic, err := strconv.ParseInt(params["idpublic"], 10, 64)
+	if err != nil {
+		log.Warningf(c, "Falha ao converter id da publicação: %v", err)
+		utils.RespondWithError(w, http.StatusBadRequest, 0, "Falha ao converter id da publicação")
+	}
+
+	usuarioID, err := autenticacao.ExtrairUsuarioID(r)
+	if err != nil {
+		log.Warningf(c, "Falha ao extrair id do usuario da requisição %v", err)
+		utils.RespondWithError(w, http.StatusBadRequest, 0, "Falha ao extrair id do usuasio da requisição")
+		return
+	}
+
+	public := publicacao.GetPublicacao(c, idPublic)
+	if public.AutorID != usuarioID {
+		log.Warningf(c, "Não é possivel deletar um usuario que não seja o seu %v", err)
+		utils.RespondWithError(w, http.StatusForbidden, 0, "Não é possivel deletar um usuario que não seja o seu")
+		return
+	}
+
+	if err = publicacao.Deletar(c, *public); err != nil {
+		log.Warningf(c, "Falha ao deletar publicação: %v", err)
+		utils.RespondWithError(w, http.StatusBadRequest, 0, "Falha ao deletar publicação")
+		return
+	}
+
+	log.Debugf(c, "Publicação Excluida")
+	utils.RespondWithJSON(w, http.StatusOK, "Publicação Excluida")
+	return
 
 }

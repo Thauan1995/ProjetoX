@@ -14,6 +14,9 @@ func main() {
 	router := mux.NewRouter()
 	r := router.PathPrefix("/api").Subrouter()
 
+	//Config
+	r.HandleFunc("/config", rest.ConfigHandler)
+
 	//Usuario
 	r.HandleFunc("/usuario/registrar", rest.RegistraUsuarioHandler)                                   //Registra um usuario
 	r.HandleFunc("/usuario/login", rest.LoginHandler)                                                 //Efetua login do usuario
@@ -26,14 +29,12 @@ func main() {
 	r.HandleFunc("/usuario/seguidos", middlewares.Autenticar(rest.BuscaUsuariosSeguidosHandler))      //Busca todos os usuarios que determinado usuario segue
 	r.HandleFunc("/usuario/seguidores", middlewares.Autenticar(rest.BuscaSeguidoresHandler))          //Busca todos os usuarios que seguem determinado usuario
 
-	//Config
-	r.HandleFunc("/config", rest.ConfigHandler)
-
 	//Publicação
 	r.HandleFunc("/publicacao", middlewares.Autenticar(rest.PublicacaoHandler))
 	r.HandleFunc("/publicacao/{id}", middlewares.Autenticar(rest.PublicacaoHandler))
 	r.HandleFunc("/publicacoes", middlewares.Autenticar(rest.PublicacoesHandler))
 	r.HandleFunc("/publicacoes/{idpublic}", middlewares.Autenticar(rest.PublicacaoHandler))
+	r.HandleFunc("/publicacoes/{idpublic}/deletar", middlewares.Autenticar(rest.PublicacaoHandler))
 
 	http.Handle("/", router)
 

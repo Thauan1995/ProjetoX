@@ -198,3 +198,19 @@ func Atualizar(c context.Context, publicacao Publicacao) error {
 
 	return PutPublicacao(c, &publicacao)
 }
+
+func Deletar(c context.Context, publicacao Publicacao) error {
+	datastoreClient, err := datastore.NewClient(c, consts.IDProjeto)
+	if err != nil {
+		log.Warningf(c, "Falha ao conectar-se com o datastore: %v", err)
+		return err
+	}
+	defer datastoreClient.Close()
+
+	key := datastore.IDKey(KindPublicacoes, publicacao.ID, nil)
+	if err = datastoreClient.Delete(c, key); err != nil {
+		log.Warningf(c, "Falha ao deletar publicação: %v", err)
+		return err
+	}
+	return nil
+}
