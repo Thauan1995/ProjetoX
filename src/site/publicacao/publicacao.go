@@ -243,7 +243,12 @@ func Curtir(c context.Context, publicacaoID int64) error {
 func Descurtir(c context.Context, publicacaoID int64) error {
 	public := GetPublicacao(c, publicacaoID)
 
-	public.Curtidas--
+	if public.Curtidas > 0 {
+		public.Curtidas--
+	} else {
+		log.Warningf(c, "Não tem como descurtir uma publicação que não foi curtido")
+		return fmt.Errorf("Não tem como descurtir uma publicação que não foi curtida")
+	}
 
 	if err := Atualizar(c, *public); err != nil {
 		log.Warningf(c, "Erro ao atualizar descurtida da publicação no banco: %v", err)
