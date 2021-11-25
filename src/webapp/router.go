@@ -24,6 +24,9 @@ func main() {
 	r.HandleFunc("/", rest.LoginHandle)
 	r.HandleFunc("/login", rest.LoginHandle)
 
+	//Cadastro
+	r.HandleFunc("/criar-usuario", rest.CarregarTelaCadastroUsuario)
+
 	http.Handle("/", router)
 
 	var port = os.Getenv("PORT")
