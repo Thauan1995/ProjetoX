@@ -16,6 +16,10 @@ func main() {
 
 	r := router.PathPrefix("/web").Subrouter()
 
+	//Configuração da pasta assets
+	fileServer := http.FileServer(http.Dir("./assets/"))
+	router.PathPrefix("/assets/").Handler(http.StripPrefix("/assets/", fileServer))
+
 	//Login
 	r.HandleFunc("/", rest.LoginHandle)
 	r.HandleFunc("/login", rest.LoginHandle)
