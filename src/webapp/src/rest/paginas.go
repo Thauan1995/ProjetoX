@@ -12,6 +12,11 @@ func LoginHandle(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if r.Method == http.MethodPost {
+		FazerLogin(w, r)
+		return
+	}
+
 }
 
 func CadastroHandler(w http.ResponseWriter, r *http.Request) {
