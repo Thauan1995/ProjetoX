@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"webapp/src/utils"
 )
 
 func CriarUsuarioHandler(w http.ResponseWriter, r *http.Request) {
@@ -42,4 +43,6 @@ func CriarUsuario(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer resp.Body.Close()
+
+	utils.JSON(w, resp.StatusCode, nil)
 }
