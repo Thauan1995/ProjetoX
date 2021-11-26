@@ -20,6 +20,7 @@ function criarUsuario(evento){
         }
     }).done(function() {
         alert("Usuário cadastrado com sucesso!");
+        window.location.href = "http://localhost:8000/web/login";
     }).fail(function(err) {
         console.log(err);
         alert("Erro ao cadastrar o usuário");
