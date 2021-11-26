@@ -1,11 +1,18 @@
-$('#formulario-cadastro').on('submit', criarUsuario);
+
+$(document).ready(function(){
+    $('#formulario-cadastro').on('submit', criarUsuario);
+});
 
 function criarUsuario(evento){
     evento.preventDefault();
     console.log("Dentro da função usuario");
 
     if ($('#senha').val() != $('#confirmar-senha').val()) {
-        alert("As senhas não coincidem!");
+        Swal.fire(
+            'Viixe!',
+            'As senhas não condizem!',
+            'error'
+        );
         return;
     }
 
@@ -19,10 +26,19 @@ function criarUsuario(evento){
             senha: $('#senha').val()
         }
     }).done(function() {
-        alert("Usuário cadastrado com sucesso!");
-        window.location.href = "http://localhost:8000/web/login";
+
+        Swal.fire(
+            'Bem-vindo!',
+            'Usuário cadastrado com sucesso!',
+            'success'
+        );
+
     }).fail(function(err) {
         console.log(err);
-        alert("Erro ao cadastrar o usuário");
+        Swal.fire(
+            'Viixe!',
+            'Error: ' + err,
+            'error'
+        );
     });
 }
