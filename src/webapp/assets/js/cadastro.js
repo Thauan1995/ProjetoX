@@ -1,4 +1,3 @@
-
 $(document).ready(function(){
     $('#formulario-cadastro').on('submit', criarUsuario);
 });
@@ -26,12 +25,12 @@ function criarUsuario(evento){
             senha: $('#senha').val()
         }
     }).done(function() {
-
         Swal.fire(
             'Bem-vindo!',
             'Usuário cadastrado com sucesso!',
             'success'
         );
+        // window.location.href = "http://localhost:8000/web/login";
 
     }).fail(function(err) {
         console.log(err);
