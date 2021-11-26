@@ -27,13 +27,14 @@ func CriarUsuario(w http.ResponseWriter, r *http.Request) {
 		"senha": r.FormValue("senha"),
 	})
 	if err != nil {
-		log.Fatal(err)
+		utils.JSON(w, http.StatusBadRequest, utils.ErroAPI{Erro: err.Error()})
+		return
 	}
 
 	urlApi := "https://estudos-312813.rj.r.appspot.com/api/usuario/registrar"
 	req, err := http.NewRequest(http.MethodPost, urlApi, bytes.NewBuffer(usuario))
 	if err != nil {
-		log.Fatal(err)
+		utils.JSON(w, http.StatusInternalServerError, utils.ErroAPI{Erro: err.Error()})
 		return
 	}
 	client := http.Client{}
@@ -43,6 +44,11 @@ func CriarUsuario(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer resp.Body.Close()
+
+	if resp.StatusCode >= 400 {
+		utils.TratarStatusCodeErro(w, resp)
+		return
+	}
 
 	utils.JSON(w, resp.StatusCode, nil)
 }
