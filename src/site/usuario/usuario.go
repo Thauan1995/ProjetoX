@@ -66,6 +66,25 @@ func GetUsuario(c context.Context, id int64) *Usuario {
 	return &usuario
 }
 
+func GetUsuarioByEmail(c context.Context, usuario Usuario) bool {
+	var check bool
+
+	usuariosBanco, err := FiltrarUsuario(c, usuario)
+	if err != nil {
+		log.Warningf(c, "Erro ao buscar usuarios pelo email: %v", err)
+		return false
+	}
+	log.Debugf(c, "Resultado do filtro %v", usuariosBanco)
+
+	for _, v := range usuariosBanco {
+		if v.Email == usuario.Email && v.Nick == usuario.Nick {
+			check = true
+		}
+	}
+
+	return check
+}
+
 func GetMultUsuario(c context.Context, keys []*datastore.Key) ([]Usuario, error) {
 	datastoreClient, err := datastore.NewClient(c, consts.IDProjeto)
 	if err != nil {

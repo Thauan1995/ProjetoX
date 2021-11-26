@@ -167,6 +167,14 @@ func InsereUsuario(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	checkBanco := usuario.GetUsuarioByEmail(c, usuarios)
+	log.Debugf(c, "checkBanco: %v", checkBanco)
+
+	if checkBanco {
+		log.Warningf(c, "Email ou nick ja existe")
+		utils.RespondWithError(w, http.StatusBadRequest, 0, "Email ou nick ja existe")
+		return
+	}
 	err = usuario.InserirUsuario(c, &usuarios)
 	if err != nil {
 		log.Warningf(c, "Falha ao inserir Usuario: %v", err)
