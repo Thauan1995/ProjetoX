@@ -39,18 +39,12 @@ const (
 )
 
 type Usuario struct {
-	ID              int64 `datastore:"-"`
-	Nome            string
-	Nick            string
-	Email           string
-	Senha           string
-	DataCriacao     time.Time
-	Estabelecimento Estabelecimento
-}
-type Estabelecimento struct {
-	CNPJ  string
-	Nome  string
-	Setor int64 // SELECT 1 - BAR 2 - RESTAURANTE 3 - LANCHONETE 4 - OUTROS
+	ID          int64 `datastore:"-"`
+	Nome        string
+	Nick        string
+	Email       string
+	Senha       string
+	DataCriacao time.Time
 }
 
 func GetUsuario(c context.Context, id int64) *Usuario {
@@ -211,12 +205,6 @@ func (usuario *Usuario) validar(etapa string) error {
 		return fmt.Errorf("O campo senha é obrigatório")
 	}
 
-	return nil
-}
-func (usuario *Usuario) validarEstabelecimento(etapa string) error {
-	if len(usuario.Estabelecimento.CNPJ) == 0 {
-		return fmt.Errorf("Este usuário não é um estabelecimento: %v", usuario.Nome)
-	}
 	return nil
 }
 
