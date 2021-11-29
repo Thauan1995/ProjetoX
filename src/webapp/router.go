@@ -26,6 +26,7 @@ func main() {
 
 	//Cadastro
 	r.HandleFunc("/criar-usuario", rest.CarregarTelaCadastroUsuario)
+	r.HandleFunc("/usuario/registrar", rest.CriarUsuarioHandler)
 
 	http.Handle("/", router)
 

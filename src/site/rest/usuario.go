@@ -151,7 +151,7 @@ func BuscaUsuario(w http.ResponseWriter, r *http.Request) {
 func InsereUsuario(w http.ResponseWriter, r *http.Request) {
 	c := r.Context()
 
-	var usuarios []usuario.Usuario
+	var usuarios usuario.Usuario
 
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
@@ -167,15 +167,21 @@ func InsereUsuario(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	for i := range usuarios {
-		log.Warningf(c, "Inserindo usuario")
-		err = usuario.InserirUsuario(c, &usuarios[i])
-		if err != nil {
-			log.Warningf(c, "Falha ao inserir Usuario: %v", err)
-			utils.RespondWithError(w, http.StatusBadRequest, 0, "Falha ao inserir Usuario")
-			return
-		}
+	checkBanco := usuario.GetUsuarioByEmail(c, usuarios)
+	log.Debugf(c, "checkBanco: %v", checkBanco)
+
+	if checkBanco {
+		log.Warningf(c, "Email ou nick ja existe")
+		utils.RespondWithError(w, http.StatusBadRequest, 0, "Email ou nick ja existe")
+		return
 	}
+	err = usuario.InserirUsuario(c, &usuarios)
+	if err != nil {
+		log.Warningf(c, "Falha ao inserir Usuario: %v", err)
+		utils.RespondWithError(w, http.StatusBadRequest, 0, "Falha ao inserir Usuario")
+		return
+	}
+
 	log.Debugf(c, "Usuario inserido com sucesso")
 	utils.RespondWithJSON(w, http.StatusOK, "Usuario Inserido com sucesso")
 }
