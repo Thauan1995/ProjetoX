@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"webapp/src/config"
+	"webapp/src/cookies"
 	"webapp/src/rest"
 	"webapp/src/utils"
 
@@ -13,6 +14,7 @@ import (
 
 func main() {
 	config.Carregar()
+	cookies.Configurar()
 	router := mux.NewRouter()
 	utils.CarregarTemplates()
 
