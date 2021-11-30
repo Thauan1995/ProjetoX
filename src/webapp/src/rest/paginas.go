@@ -1,9 +1,11 @@
 package rest
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"webapp/src/config"
+	"webapp/src/modelos"
 	"webapp/src/requisicoes"
 	"webapp/src/utils"
 )
@@ -52,7 +54,22 @@ func CarregarTelaCadastroUsuario(w http.ResponseWriter, r *http.Request) {
 func CarregarHome(w http.ResponseWriter, r *http.Request) {
 	url := fmt.Sprintf("%s/publicacoes", config.ApiUrl)
 	resp, err := requisicoes.FazerRequisicaoComAutenticacao(r, http.MethodGet, url, nil)
-	fmt.Println(resp.StatusCode, err)
+	if err != nil {
+		utils.JSON(w, http.StatusInternalServerError, utils.ErroAPI{Erro: err.Error()})
+		return
+	}
+	defer resp.Body.Close()
 
-	utils.ExecutarTemplate(w, "home.html", nil)
+	if resp.StatusCode >= 400 {
+		utils.TratarStatusCodeErro(w, resp)
+		return
+	}
+
+	var publicacoes []modelos.Publicacao
+	if err = json.NewDecoder(resp.Body).Decode(&publicacoes); err != nil {
+		utils.JSON(w, http.StatusUnprocessableEntity, utils.ErroAPI{Erro: err.Error()})
+		return
+	}
+
+	utils.ExecutarTemplate(w, "home.html", publicacoes)
 }
