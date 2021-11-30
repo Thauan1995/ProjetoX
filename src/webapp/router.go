@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"webapp/src/config"
 	"webapp/src/cookies"
+	"webapp/src/middlewares"
 	"webapp/src/rest"
 	"webapp/src/utils"
 
@@ -31,6 +32,9 @@ func main() {
 	//Cadastro
 	r.HandleFunc("/criar-usuario", rest.CarregarTelaCadastroUsuario)
 	r.HandleFunc("/usuario/registrar", rest.CriarUsuarioHandler)
+
+	//Home
+	r.HandleFunc("/home", middlewares.Logger(middlewares.Autenticar(rest.HomeHandler)))
 
 	http.Handle("/", router)
 
