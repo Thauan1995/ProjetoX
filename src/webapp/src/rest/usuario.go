@@ -3,8 +3,10 @@ package rest
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
+	"webapp/src/config"
 	"webapp/src/utils"
 )
 
@@ -31,8 +33,8 @@ func CriarUsuario(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	urlApi := "https://estudos-312813.rj.r.appspot.com/api/usuario/registrar"
-	req, err := http.NewRequest(http.MethodPost, urlApi, bytes.NewBuffer(usuario))
+	url := fmt.Sprintf("%s/usuario/registrar", config.ApiUrl)
+	req, err := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(usuario))
 	if err != nil {
 		utils.JSON(w, http.StatusInternalServerError, utils.ErroAPI{Erro: err.Error()})
 		return
