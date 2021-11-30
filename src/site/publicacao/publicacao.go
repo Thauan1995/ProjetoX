@@ -161,7 +161,7 @@ func Buscar(c context.Context, usuarioID int64) ([]Publicacao, error) {
 
 	seguidos, err := seguidores.BuscarUsuariosSeguidos(c, usuarioID)
 	if err != nil {
-		log.Warningf(c, "Erro ao buscar usuarios seguidos para perara busca de publicações %v", err)
+		log.Warningf(c, "Erro ao buscar usuarios seguidos para preparar busca de publicações %v", err)
 		return nil, err
 	}
 

@@ -1,9 +1,12 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
-	"os"
+	"webapp/src/config"
+	"webapp/src/cookies"
+	"webapp/src/middlewares"
 	"webapp/src/rest"
 	"webapp/src/utils"
 
@@ -11,6 +14,8 @@ import (
 )
 
 func main() {
+	config.Carregar()
+	cookies.Configurar()
 	router := mux.NewRouter()
 	utils.CarregarTemplates()
 
@@ -28,15 +33,13 @@ func main() {
 	r.HandleFunc("/criar-usuario", rest.CarregarTelaCadastroUsuario)
 	r.HandleFunc("/usuario/registrar", rest.CriarUsuarioHandler)
 
+	//Home
+	r.HandleFunc("/home", middlewares.Logger(middlewares.Autenticar(rest.HomeHandler)))
+
 	http.Handle("/", router)
 
-	var port = os.Getenv("PORT")
-	if port == "" {
-		port = "8000"
-		log.Printf("Padronizando para porta %s", port)
-	}
-
-	if err := http.ListenAndServe(":"+port, nil); err != nil {
+	fmt.Printf("Escutando na porta %d\n", config.Porta)
+	if err := http.ListenAndServe(fmt.Sprintf(":%d", config.Porta), nil); err != nil {
 		log.Fatal(err)
 	}
 }

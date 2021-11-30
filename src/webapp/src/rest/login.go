@@ -6,34 +6,27 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"webapp/src/autenticacao"
 	"webapp/src/config"
+	"webapp/src/cookies"
 	"webapp/src/utils"
 )
 
-func CriarUsuarioHandler(w http.ResponseWriter, r *http.Request) {
-
-	if r.Method == http.MethodPost {
-		CriarUsuario(w, r)
-		return
-	}
-}
-
-//Chama a API para cadastrar um usuario no banco de dados
-func CriarUsuario(w http.ResponseWriter, r *http.Request) {
+// Utiliza o email e senha do usuario para autenticar na aplicação
+func FazerLogin(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 
 	usuario, err := json.Marshal(map[string]string{
-		"nome":  r.FormValue("nome"),
-		"nick":  r.FormValue("nick"),
 		"email": r.FormValue("email"),
 		"senha": r.FormValue("senha"),
 	})
+
 	if err != nil {
 		utils.JSON(w, http.StatusBadRequest, utils.ErroAPI{Erro: err.Error()})
 		return
 	}
 
-	url := fmt.Sprintf("%s/usuario/registrar", config.ApiUrl)
+	url := fmt.Sprintf("%s/usuario/login", config.ApiUrl)
 	req, err := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(usuario))
 	if err != nil {
 		utils.JSON(w, http.StatusInternalServerError, utils.ErroAPI{Erro: err.Error()})
@@ -49,6 +42,17 @@ func CriarUsuario(w http.ResponseWriter, r *http.Request) {
 
 	if resp.StatusCode >= 400 {
 		utils.TratarStatusCodeErro(w, resp)
+		return
+	}
+
+	var dadosAutenticacao autenticacao.DadosAutenticacao
+	if err = json.NewDecoder(resp.Body).Decode(&dadosAutenticacao); err != nil {
+		utils.JSON(w, http.StatusUnprocessableEntity, utils.ErroAPI{Erro: err.Error()})
+		return
+	}
+
+	if err = cookies.Salvar(w, dadosAutenticacao.ID, dadosAutenticacao.Token); err != nil {
+		utils.JSON(w, http.StatusUnprocessableEntity, utils.ErroAPI{Erro: err.Error()})
 		return
 	}
 

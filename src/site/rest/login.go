@@ -9,6 +9,7 @@ import (
 	"site/usuario"
 	"site/utils"
 	"site/utils/log"
+	"strconv"
 )
 
 // Login é responsavel por autenticar um usuario na API
@@ -60,7 +61,10 @@ func AcessarUsuario(w http.ResponseWriter, r *http.Request) {
 		}
 		w.Header().Set("Authoriozation", token)
 		log.Debugf(c, "Login autorizado com sucesso! Auth: %s", token)
-		utils.RespondWithJSON(w, http.StatusOK, token)
+
+		usuarioID := strconv.FormatInt(usu.ID, 10)
+
+		utils.RespondWithJSON(w, http.StatusOK, autenticacao.DadosAutenticacao{ID: usuarioID, Token: token})
 	}
 
 }

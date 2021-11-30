@@ -13,6 +13,11 @@ import (
 	jwt "github.com/dgrijalva/jwt-go"
 )
 
+type DadosAutenticacao struct {
+	ID    string
+	Token string
+}
+
 // Criar token retorna um token assinado com as permissões do usuario
 func CriarToken(c context.Context, usuarioID int64) (string, error) {
 
