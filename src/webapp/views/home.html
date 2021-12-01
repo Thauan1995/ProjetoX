@@ -4,37 +4,13 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Projeto X</title>
+    <title>Projeto-X</title>
     <link href="/assets/css/bootstrap.css" rel="stylesheet" />
 </head>
 
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="#">Navbar</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarTogglerDemo02"
-                aria-controls="navbarTogglerDemo02" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarTogglerDemo02">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="#">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Link</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link disabled">Disabled</a>
-                    </li>
-                </ul>
-                <form class="d-flex">
-                    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-                    <button class="btn btn-outline-success" type="submit">Search</button>
-                </form>
-            </div>
-        </div>
-    </nav>
+
+   {{ template "cabecalho"}}
 
     <div class="container-fluid">
         <div class="row mt-4*">
@@ -48,14 +24,36 @@
                             <input type="text" class="form-control" id="titulo" name="titulo" required="required"
                                 placeholder="Insira o titulo da sua publicação">
                         </div>
+                        <div class="form-group">
+                            <label for="conteudo">Conteúdo</label>
+                            <textarea class="form-control" id="conteudo" name="conteudo" required="required"
+                                placeholder="Insira o conteúdo da sua publicação"></textarea>
+                        </div>
+
+                        <button class="btn btn-primary" type="submit">
+                            Publicar
+                        </button>
                     </form>
                 </fieldset>
             </div>
             <div class="col-xs-12 col-sm-12 col-md-7 col-lg-7 col-xl-7">
                 <!-- Publicações -->
+                {{range .}}
+                <div class="bg-light p-5 rounded-lg m-3">
+                    <h1 class="display-4">{{.Titulo}}</h1>
+                    <p class="lead">{{.Conteudo}}</p>
+                    <a href="#">{{.AutorNick}} - {{.DataCriacao}}</a>
+                    <hr class="my-4">
+                    <p>Botões curtir/excluir/editar</p>
+                </div>
+                {{end}}
             </div>
         </div>
     </div>
+
+    {{template "rodape"}}
+
+    {{template "scripts"}}
 </body>
 
 </html>

@@ -1,0 +1,35 @@
+{{define "cabecalho"}}
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">Projeto-X</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar-principal"
+            aria-controls="navbar-principal" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbar-principal">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="/web/home">Página Principal</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="/web/perfil">Meu Perfil</a>
+                    <!--Criar Rota Perfil-->
+                </li>
+
+                <li class="nav-item">
+                    <form class="d-flex" action="/web/buscar-usuarios" method="GET"> <!--Criar rota para buscar usuario-->
+                        <input class="form-control me-2" type="search" placeholder="Search"
+                            aria-label="Buscar Usuários" id="usuario" name="usuario" required="required">
+                    </form>
+                </li>
+            </ul>
+        </div>
+
+        <span class="navbar-text p-0">
+            <a href="/web/logout">Sair</a>
+        </span>
+    </div>
+</nav>
+{{end}}
