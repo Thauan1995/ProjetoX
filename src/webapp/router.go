@@ -36,6 +36,9 @@ func main() {
 	//Home
 	r.HandleFunc("/home", middlewares.Logger(middlewares.Autenticar(rest.HomeHandler)))
 
+	//Publicacoes
+	r.HandleFunc("/publicacoes", middlewares.Logger(middlewares.Autenticar(rest.PublicacaoHandler)))
+
 	http.Handle("/", router)
 
 	fmt.Printf("Escutando na porta %d\n", config.Porta)
