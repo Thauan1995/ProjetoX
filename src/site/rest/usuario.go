@@ -49,7 +49,15 @@ func AtualizaUsuarioHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if r.Method == http.MethodPost {
+	log.Warningf(c, "Método não permitido")
+	utils.RespondWithError(w, http.StatusMethodNotAllowed, 0, "Método não permitido")
+	return
+}
+
+func AtualizaSenhaHandler(w http.ResponseWriter, r *http.Request) {
+	c := r.Context()
+
+	if r.Method == http.MethodPut {
 		AtualizaSenha(w, r)
 		return
 	}
@@ -72,16 +80,24 @@ func DeletaUsuarioHandler(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
-func SeguidorHandler(w http.ResponseWriter, r *http.Request) {
+func SeguirHandler(w http.ResponseWriter, r *http.Request) {
 	c := r.Context()
 
-	if r.Method == http.MethodPost {
+	if r.Method == http.MethodPut {
 		SeguirUsuario(w, r)
 		return
 	}
 
+	log.Warningf(c, "Método não permitido")
+	utils.RespondWithError(w, http.StatusMethodNotAllowed, 0, "Método não permitido")
+	return
+}
+
+func UnFollowHandler(w http.ResponseWriter, r *http.Request) {
+	c := r.Context()
+
 	if r.Method == http.MethodPut {
-		UnSeguirUsuarios(w, r)
+		UnFollowUsuarios(w, r)
 		return
 	}
 
@@ -314,7 +330,7 @@ func SeguirUsuario(w http.ResponseWriter, r *http.Request) {
 }
 
 //Permite que um usuario pare de seguir outro
-func UnSeguirUsuarios(w http.ResponseWriter, r *http.Request) {
+func UnFollowUsuarios(w http.ResponseWriter, r *http.Request) {
 	c := r.Context()
 	var usu usuario.Usuario
 
