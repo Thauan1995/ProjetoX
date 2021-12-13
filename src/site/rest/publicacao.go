@@ -21,15 +21,40 @@ func PublicacaoHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	log.Warningf(c, "Método não permitido")
+	utils.RespondWithError(w, http.StatusMethodNotAllowed, 0, "Método não permitido")
+	return
+}
+
+func BuscaPublicHandler(w http.ResponseWriter, r *http.Request) {
+	c := r.Context()
+
 	if r.Method == http.MethodGet {
 		BuscarPublicacao(w, r)
 		return
 	}
 
+	log.Warningf(c, "Método não permitido")
+	utils.RespondWithError(w, http.StatusMethodNotAllowed, 0, "Método não permitido")
+	return
+
+}
+
+func AtualizaPublicHandler(w http.ResponseWriter, r *http.Request) {
+	c := r.Context()
+
 	if r.Method == http.MethodPut {
 		AtualizarPublicacao(w, r)
 		return
 	}
+
+	log.Warningf(c, "Método não permitido")
+	utils.RespondWithError(w, http.StatusMethodNotAllowed, 0, "Método não permitido")
+	return
+}
+
+func DeletaPublicHandler(w http.ResponseWriter, r *http.Request) {
+	c := r.Context()
 
 	if r.Method == http.MethodDelete {
 		DeletarPublicacao(w, r)
@@ -49,10 +74,26 @@ func PublicacoesHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	log.Warningf(c, "Método não permitido")
+	utils.RespondWithError(w, http.StatusMethodNotAllowed, 0, "Método não permitido")
+	return
+}
+
+func CurtirPublicHandler(w http.ResponseWriter, r *http.Request) {
+	c := r.Context()
+
 	if r.Method == http.MethodPost {
 		CurtirPublicacao(w, r)
 		return
 	}
+
+	log.Warningf(c, "Método não permitido")
+	utils.RespondWithError(w, http.StatusMethodNotAllowed, 0, "Método não permitido")
+	return
+}
+
+func DescurtirPublicHandler(w http.ResponseWriter, r *http.Request) {
+	c := r.Context()
 
 	if r.Method == http.MethodPut {
 		DescurtiPublicacao(w, r)
