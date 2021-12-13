@@ -1,0 +1,49 @@
+<!-- Template de curtidas -->
+{{ define "curtidas" }}
+<i class="fas fa-heart text-danger"></i>
+<span> {{.Curtidas }} </span>
+{{ end }}
+
+<!-- Template de edição -->
+{{ define "editar"}}
+<a href="/editar" style="text-decoration: none;">
+    <i class="fas fa-edit text-black"></i> 
+</a>
+{{end}}
+
+<!-- Template de excluir -->
+{{define "excluir"}}
+<a href="/excluir" style="text-decoration: none;">
+    <i class="fas fa-trash-alt text-black"></i>
+</a>
+{{end}}
+
+<!-- Template de cabeçalho -->
+{{ define "cabecalho-publicacao" }}
+    <h1 class="display-4">{{.Titulo}}</h1>
+    <p class="lead">{{.Conteudo}}</p>
+    <a href="#">{{.AutorNick}} - {{.DataCriacao.Format "02/01/2006"}}</a>
+    <hr class="my-4">
+{{ end }}
+
+<!-- Template de publicação com permissão -->
+{{ define "publicacao-com-permissao" }}
+    <div class="bg-light p-5 rounded-lg m-3" data-publicacao-id="{{ .ID }}">
+        {{ template "cabecalho-publicacao" . }}
+        <p>
+            {{ template "curtidas" . }}
+            {{ template "editar" . }}
+            {{ template "excluir" . }}
+        </p>
+    </div>
+{{ end }}
+
+<!-- Template de publicação sem permissão -->
+{{ define "publicacao-sem-permissao" }}
+    <div class="bg-light p-5 rounded-lg m-3" data-publicacao-id="{{ .ID }}">
+        {{ template "cabecalho-publicacao" . }}
+        <p>
+            {{template "curtidas" .}}
+        </p>
+    </div>
+{{ end }}
