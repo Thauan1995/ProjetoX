@@ -27,6 +27,13 @@ func CurtirPublicHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func DescurtirPublicHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodPut {
+		DescurtirPublicacao(w, r)
+		return
+	}
+}
+
 //Chama a API para cadastrar a publicação no banco de dados
 func CriarPublicacao(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
@@ -57,6 +64,8 @@ func CriarPublicacao(w http.ResponseWriter, r *http.Request) {
 	utils.JSON(w, response.StatusCode, nil)
 }
 
+//TODO: Desenvolver metodo de salvar dados do usuario que curte a publicação na API
+
 //Chama a API para curtir uma publicação
 func CurtirPublicacao(w http.ResponseWriter, r *http.Request) {
 	parametros := mux.Vars(r)
@@ -68,6 +77,31 @@ func CurtirPublicacao(w http.ResponseWriter, r *http.Request) {
 
 	url := fmt.Sprintf("%s/publicacoes/%d/curtir", config.ApiUrl, publicacaoID)
 	resp, err := requisicoes.FazerRequisicaoComAutenticacao(r, http.MethodPost, url, nil)
+	if err != nil {
+		utils.JSON(w, http.StatusInternalServerError, utils.ErroAPI{Erro: err.Error()})
+		return
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode >= 400 {
+		utils.TratarStatusCodeErro(w, resp)
+		return
+	}
+
+	utils.JSON(w, resp.StatusCode, nil)
+}
+
+//Chama a API para descurtir uma publicação
+func DescurtirPublicacao(w http.ResponseWriter, r *http.Request) {
+	parametros := mux.Vars(r)
+	publicacaoID, err := strconv.ParseInt(parametros["publicacaoId"], 10, 64)
+	if err != nil {
+		utils.JSON(w, http.StatusBadRequest, utils.ErroAPI{Erro: err.Error()})
+		return
+	}
+
+	url := fmt.Sprintf("%s/publicacoes/%d/descurtir", config.ApiUrl, publicacaoID)
+	resp, err := requisicoes.FazerRequisicaoComAutenticacao(r, http.MethodPut, url, nil)
 	if err != nil {
 		utils.JSON(w, http.StatusInternalServerError, utils.ErroAPI{Erro: err.Error()})
 		return

@@ -39,6 +39,7 @@ func main() {
 	//Publicacoes
 	r.HandleFunc("/publicacoes", middlewares.Logger(middlewares.Autenticar(rest.PublicacaoHandler)))
 	r.HandleFunc("/publicacoes/{publicacaoId}/curtir", middlewares.Logger(middlewares.Autenticar(rest.CurtirPublicHandler)))
+	r.HandleFunc("/publicacoes/{publicacaoId}/descurtir", middlewares.Logger(middlewares.Autenticar(rest.DescurtirPublicHandler)))
 
 	http.Handle("/", router)
 
