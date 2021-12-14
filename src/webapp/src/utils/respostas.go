@@ -19,6 +19,7 @@ func JSON(w http.ResponseWriter, statusCode int, dados interface{}) {
 	if err := json.NewEncoder(w).Encode(dados); err != nil {
 		log.Fatal(err)
 	}
+
 }
 
 //Trata as requisições com status code 400 ou superior
