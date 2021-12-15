@@ -4,6 +4,7 @@ $(document).on('click', '.curtir-publicacao', curtirPublicacao);
 $(document).on('click', '.descurtir-publicacao', descurtirPublicacao);
 
 $('#atualizar-publicacao').on('click', atualizarPublicacao);
+$('.deletar-publicacao').on('click', deletarPublicacao);
 
 function criarPublicacao(evento) {
     evento.preventDefault();
@@ -78,7 +79,7 @@ function descurtirPublicacao(evento) {
     });
 }
 
-function atualizarPublicacao(evento) {
+function atualizarPublicacao() {
     $(this).prop('disebled', true);
 
     const publicacaoId = $(this).data('publicacao-id');
@@ -97,4 +98,25 @@ function atualizarPublicacao(evento) {
     }).always(function(){
         $('#atualizar-publicacao').prop('disabled', false);
     })
+}
+
+function deletarPublicacao(evento) {
+    evento.preventDefault();
+
+    const elementoClicado = $(evento.target);
+    const publicacao = elementoClicado.closest('div')
+    const publicacaoId = publicacao.data('publicacao-id');
+
+    elementoClicado.prop('disabled', true);
+
+    $.ajax({
+        url: `/web/publicacoes/${publicacaoId}/deletar`,
+        method: "DELETE"
+    }).done(function(){
+        publicacao.fadeOut("slow", function(){
+            $(this).remove();
+        });
+    }).fail(function(){
+        alert("Erro ao excluir a publicação");
+    });
 }
