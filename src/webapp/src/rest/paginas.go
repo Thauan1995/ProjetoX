@@ -10,6 +10,8 @@ import (
 	"webapp/src/modelos"
 	"webapp/src/requisicoes"
 	"webapp/src/utils"
+
+	"github.com/gorilla/mux"
 )
 
 func LoginHandle(w http.ResponseWriter, r *http.Request) {
@@ -38,6 +40,13 @@ func HomeHandler(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method == http.MethodGet {
 		CarregarHome(w, r)
+		return
+	}
+}
+
+func PaginaEditPublicHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodGet {
+		CarregarPagEditPublic(w, r)
 		return
 	}
 }
@@ -83,4 +92,35 @@ func CarregarHome(w http.ResponseWriter, r *http.Request) {
 		Publicacoes: publicacoes,
 		UsuarioID:   usuarioID,
 	})
+}
+
+//Renderiza a pagina para edição de uma publicação
+func CarregarPagEditPublic(w http.ResponseWriter, r *http.Request) {
+	parametros := mux.Vars(r)
+	publicID, err := strconv.ParseInt(parametros["publicacaoId"], 10, 64)
+	if err != nil {
+		utils.JSON(w, http.StatusBadRequest, utils.ErroAPI{Erro: err.Error()})
+		return
+	}
+
+	url := fmt.Sprintf("%s/publicacao/%d", config.ApiUrl, publicID)
+	resp, err := requisicoes.FazerRequisicaoComAutenticacao(r, http.MethodGet, url, nil)
+	if err != nil {
+		utils.JSON(w, http.StatusInternalServerError, utils.ErroAPI{Erro: err.Error()})
+		return
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode >= 400 {
+		utils.TratarStatusCodeErro(w, resp)
+		return
+	}
+
+	var public modelos.Publicacao
+	if err = json.NewDecoder(resp.Body).Decode(&public); err != nil {
+		utils.JSON(w, http.StatusUnprocessableEntity, utils.ErroAPI{Erro: err.Error()})
+		return
+	}
+
+	utils.ExecutarTemplate(w, "atualizar-publicacao.html", public)
 }
