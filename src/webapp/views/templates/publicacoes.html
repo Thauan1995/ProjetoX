@@ -1,6 +1,6 @@
 <!-- Template de curtidas -->
 {{ define "curtidas" }}
-<i class="fas fa-heart curtir-publicacao"></i>
+<i class="fas fa-heart curtir-publicacao" style="cursor: pointer;"></i>
 <span> {{.Curtidas }} </span>
 {{ end }}
 
@@ -13,8 +13,7 @@
 
 <!-- Template de excluir -->
 {{define "excluir"}}
-<a href="/excluir" style="text-decoration: none;">
-    <i class="fas fa-trash-alt text-black"></i>
+    <i class="fas fa-trash-alt text-black deletar-publicacao" style="cursor: pointer;"></i>
 </a>
 {{end}}
 
