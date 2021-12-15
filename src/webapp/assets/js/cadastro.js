@@ -29,14 +29,30 @@ function criarUsuario(evento){
             'Bem-vindo!',
             'Usuário cadastrado com sucesso!',
             'success'
-        );
-        // window.location.href = "http://localhost:8000/web/login";
-
+        )
+        .then(function(){
+            $.ajax({
+                url: "/web/login",
+                method: "POST",
+                data: {
+                    email: $("#email").val(),
+                    senha: $("#senha").val()
+                }
+            }).done(function(){
+                window.location = "/web/home";
+            }).fail(function(){
+                Swal.fire(
+                    'Ops...',
+                    'Erro ao autenticar usuario!',
+                    'error'
+                ); 
+            })
+        })
     }).fail(function(err) {
         console.log(err);
         Swal.fire(
-            'Viixe!',
-            'Error: ' + err,
+            'Ops...',
+            'Email/Nick invalido ou ja existe!',
             'error'
         );
     });
