@@ -34,6 +34,13 @@ func DescurtirPublicHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func AtualizaPublicHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodPut {
+		AtualizarPublicacao(w, r)
+		return
+	}
+}
+
 //Chama a API para cadastrar a publicação no banco de dados
 func CriarPublicacao(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
@@ -102,6 +109,42 @@ func DescurtirPublicacao(w http.ResponseWriter, r *http.Request) {
 
 	url := fmt.Sprintf("%s/publicacoes/%d/descurtir", config.ApiUrl, publicacaoID)
 	resp, err := requisicoes.FazerRequisicaoComAutenticacao(r, http.MethodPut, url, nil)
+	if err != nil {
+		utils.JSON(w, http.StatusInternalServerError, utils.ErroAPI{Erro: err.Error()})
+		return
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode >= 400 {
+		utils.TratarStatusCodeErro(w, resp)
+		return
+	}
+
+	utils.JSON(w, resp.StatusCode, nil)
+}
+
+//Chama a API para Atualizar uma publicação
+func AtualizarPublicacao(w http.ResponseWriter, r *http.Request) {
+	parametros := mux.Vars(r)
+	publicacaoID, err := strconv.ParseInt(parametros["publicacaoId"], 10, 64)
+	if err != nil {
+		utils.JSON(w, http.StatusBadRequest, utils.ErroAPI{Erro: err.Error()})
+		return
+	}
+
+	r.ParseForm()
+	publicacao, err := json.Marshal(map[string]string{
+		"titulo":   r.FormValue("titulo"),
+		"conteudo": r.FormValue("conteudo"),
+	})
+
+	if err != nil {
+		utils.JSON(w, http.StatusBadRequest, utils.ErroAPI{Erro: err.Error()})
+		return
+	}
+
+	url := fmt.Sprintf("%s/publicacoes/%d", config.ApiUrl, publicacaoID)
+	resp, err := requisicoes.FazerRequisicaoComAutenticacao(r, http.MethodPut, url, bytes.NewBuffer(publicacao))
 	if err != nil {
 		utils.JSON(w, http.StatusInternalServerError, utils.ErroAPI{Erro: err.Error()})
 		return
