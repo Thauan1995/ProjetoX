@@ -34,7 +34,7 @@ func GetSeguidorByIDSeguidor(c context.Context, idSeguidor int64) *Seguidor {
 
 	if err := datastoreClient.Get(c, key, &seguidor); err != nil {
 		log.Warningf(c, "Falha na busca do seguidor : %v", err)
-		return nil
+		//return nil
 	}
 
 	seguidor.IDSeguidor = idSeguidor
@@ -190,19 +190,20 @@ func BuscarUsuariosSeguidos(c context.Context, seguidorID int64) ([]usuario.Usua
 	var usuarios []usuario.Usuario
 	seguidorBanco := GetSeguidorByIDSeguidor(c, seguidorID)
 
-	for _, v := range seguidorBanco.IDUsuario {
-		if v == 0 {
-			continue
+	if seguidorBanco != nil {
+		for _, v := range seguidorBanco.IDUsuario {
+			if v == 0 {
+				continue
+			}
+			usu := usuario.GetUsuario(c, v)
+			usuarios = append(usuarios, usuario.Usuario{
+				ID:          usu.ID,
+				Nome:        usu.Nome,
+				Nick:        usu.Nick,
+				Email:       usu.Email,
+				DataCriacao: usu.DataCriacao,
+			})
 		}
-		usu := usuario.GetUsuario(c, v)
-		usuarios = append(usuarios, usuario.Usuario{
-			ID:          usu.ID,
-			Nome:        usu.Nome,
-			Nick:        usu.Nick,
-			Email:       usu.Email,
-			DataCriacao: usu.DataCriacao,
-		})
-
 	}
 	return usuarios, nil
 }
