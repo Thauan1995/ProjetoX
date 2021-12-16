@@ -29,6 +29,9 @@ func main() {
 	r.HandleFunc("/", rest.LoginHandle)
 	r.HandleFunc("/login", rest.LoginHandle)
 
+	//Logout
+	r.HandleFunc("/logout", middlewares.Logger(middlewares.Autenticar(rest.FazerLogout)))
+
 	//Cadastro
 	r.HandleFunc("/criar-usuario", rest.CarregarTelaCadastroUsuario)
 	r.HandleFunc("/usuario/registrar", rest.CriarUsuarioHandler)
