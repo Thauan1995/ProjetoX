@@ -248,36 +248,29 @@ func AtualizaUsuario(w http.ResponseWriter, r *http.Request) {
 func DeletaUsuario(w http.ResponseWriter, r *http.Request) {
 	c := r.Context()
 
-	var usu usuario.Usuario
-
-	usuarioIDNoToken, err := autenticacao.ExtrairUsuarioID(r)
+	params := mux.Vars(r)
+	idUsu, err := strconv.ParseInt(params["idusuario"], 10, 64)
 	if err != nil {
-		log.Warningf(c, "Erro ao extrair id do usuario da requisição %v", err)
-		utils.RespondWithError(w, http.StatusBadRequest, 0, "Erro ao extrair id do usuario da requisição")
-		return
+		log.Warningf(c, "Falha ao converter id do usuário: %v", err)
+		utils.RespondWithError(w, http.StatusBadRequest, 0, "Falha ao converter id do usuário")
 	}
 
-	body, err := ioutil.ReadAll(r.Body)
+	usuarioID, err := autenticacao.ExtrairUsuarioID(r)
 	if err != nil {
-		log.Warningf(c, "Erro ao receber body de usuario")
-		utils.RespondWithError(w, http.StatusBadRequest, 0, "Erro ao receber body de usuario")
+		log.Warningf(c, "Erro ao extrair id do usuário da requisição %v", err)
+		utils.RespondWithError(w, http.StatusBadRequest, 0, "Erro ao extrair id do usuário da requisição")
 		return
 	}
 
-	if err = json.Unmarshal(body, &usu); err != nil {
-		log.Warningf(c, "Erro ao realizar unmarshal do usuario %v", err)
-		utils.RespondWithError(w, http.StatusBadRequest, 0, "Erro ao realizar unmarshal do usuario")
+	usu := usuario.GetUsuario(c, idUsu)
+
+	if usu.ID != usuarioID {
+		log.Warningf(c, "Usuario %v não tem autenticação para fazer essa ação", err)
+		utils.RespondWithError(w, http.StatusBadRequest, 0, "Usuario não tem autenticação para fazer essa ação")
 		return
 	}
 
-	if usu.ID != usuarioIDNoToken {
-		log.Warningf(c, "Usuario não tem autenticação para fazer essa ação")
-		utils.RespondWithError(w, http.StatusForbidden, 0, "Usuario não tem autenticação para fazer essa ação")
-		return
-	}
-
-	err = usuario.DeletarUsuario(c, usu)
-	if err != nil {
+	if err = usuario.DeletarUsuario(c, *usu); err != nil {
 		log.Warningf(c, "Falha ao deletar usuario")
 		utils.RespondWithError(w, http.StatusBadRequest, 0, "Falha ao deletar usuario")
 		return

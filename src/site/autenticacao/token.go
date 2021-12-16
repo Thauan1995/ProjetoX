@@ -46,7 +46,7 @@ func ValidarToken(r *http.Request) error {
 	return fmt.Errorf("Token inválido")
 }
 
-// ExtarUsuarioID retorna o usuarioID que está salvo no token
+// ExtrairUsuarioID retorna o usuarioID que está salvo no token
 func ExtrairUsuarioID(r *http.Request) (int64, error) {
 	c := r.Context()
 	tokenString := extrairToken(r)
