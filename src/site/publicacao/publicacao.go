@@ -165,15 +165,16 @@ func Buscar(c context.Context, usuarioID int64) ([]Publicacao, error) {
 		return nil, err
 	}
 
-	for _, v := range seguidos {
-		publicacao.AutorID = v.ID
-		publicSeguidos, err := FiltrarPublicacoes(c, publicacao)
-		if err != nil {
-			log.Warningf(c, "Erro filtrar publicações pelo usuarioID dos seguidos: %v", err)
-			return nil, err
+	if seguidos != nil {
+		for _, v := range seguidos {
+			publicacao.AutorID = v.ID
+			publicSeguidos, err := FiltrarPublicacoes(c, publicacao)
+			if err != nil {
+				log.Warningf(c, "Erro filtrar publicações pelo usuarioID dos seguidos: %v", err)
+				return nil, err
+			}
+			publics = append(publics, publicSeguidos...)
 		}
-		publics = append(publics, publicSeguidos...)
-
 	}
 
 	//ordenando publicações pela data mais recente
@@ -182,7 +183,6 @@ func Buscar(c context.Context, usuarioID int64) ([]Publicacao, error) {
 	})
 
 	return publics, nil
-	// TODO: Corrigir erro de bad request ocorrido quando um usuario que não segue ngm efetua a busca de publicações
 }
 
 func Atualizar(c context.Context, publicacao Publicacao) error {
