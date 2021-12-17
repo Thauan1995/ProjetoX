@@ -32,9 +32,10 @@ func main() {
 	//Logout
 	r.HandleFunc("/logout", middlewares.Logger(middlewares.Autenticar(rest.FazerLogout)))
 
-	//Cadastro
+	//Usuario
 	r.HandleFunc("/criar-usuario", rest.CarregarTelaCadastroUsuario)
 	r.HandleFunc("/usuario/registrar", rest.CriarUsuarioHandler)
+	r.HandleFunc("/buscar-usuarios", middlewares.Logger(middlewares.Autenticar(rest.CarregarPagUsuarioHandler)))
 
 	//Home
 	r.HandleFunc("/home", middlewares.Logger(middlewares.Autenticar(rest.HomeHandler)))

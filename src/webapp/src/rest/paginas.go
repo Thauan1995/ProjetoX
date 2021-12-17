@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 	"webapp/src/config"
 	"webapp/src/cookies"
 	"webapp/src/modelos"
@@ -47,6 +48,13 @@ func HomeHandler(w http.ResponseWriter, r *http.Request) {
 func PaginaEditPublicHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodGet {
 		CarregarPagEditPublic(w, r)
+		return
+	}
+}
+
+func CarregarPagUsuarioHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodGet {
+		CarregarPaginaUsuarios(w, r)
 		return
 	}
 }
@@ -130,4 +138,30 @@ func CarregarPagEditPublic(w http.ResponseWriter, r *http.Request) {
 	}
 
 	utils.ExecutarTemplate(w, "atualizar-publicacao.html", public)
+}
+
+//Renderiza a pagina de usuarios que atendem o filtro passado
+func CarregarPaginaUsuarios(w http.ResponseWriter, r *http.Request) {
+	nomeOuNick := strings.ToLower(r.URL.Query().Get("usuario"))
+	url := fmt.Sprintf("%s/usuario/buscar?Nick=%s", config.ApiUrl, nomeOuNick)
+
+	resp, err := requisicoes.FazerRequisicaoComAutenticacao(r, http.MethodGet, url, nil)
+	if err != nil {
+		utils.JSON(w, http.StatusInternalServerError, utils.ErroAPI{Erro: err.Error()})
+		return
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode >= 400 {
+		utils.TratarStatusCodeErro(w, resp)
+		return
+	}
+
+	var usuarios []modelos.Usuario
+	if err = json.NewDecoder(resp.Body).Decode(&usuarios); err != nil {
+		utils.JSON(w, http.StatusUnprocessableEntity, utils.ErroAPI{Erro: err.Error()})
+		return
+	}
+
+	utils.ExecutarTemplate(w, "usuarios.html", usuarios)
 }
