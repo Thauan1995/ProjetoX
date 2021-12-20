@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
-	"strings"
 	"webapp/src/config"
 	"webapp/src/cookies"
 	"webapp/src/modelos"
@@ -142,7 +141,7 @@ func CarregarPagEditPublic(w http.ResponseWriter, r *http.Request) {
 
 //Renderiza a pagina de usuarios que atendem o filtro passado
 func CarregarPaginaUsuarios(w http.ResponseWriter, r *http.Request) {
-	nomeOuNick := strings.ToLower(r.URL.Query().Get("usuario"))
+	nomeOuNick := r.URL.Query().Get("usuario")
 	url := fmt.Sprintf("%s/usuario/buscar?Nick=%s", config.ApiUrl, nomeOuNick)
 
 	resp, err := requisicoes.FazerRequisicaoComAutenticacao(r, http.MethodGet, url, nil)
