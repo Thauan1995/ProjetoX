@@ -353,25 +353,15 @@ func UnFollowUsuarios(w http.ResponseWriter, r *http.Request) {
 // Traz todas as pessoas que o usuario esta seguindo
 func BuscaUsuariosSeguidos(w http.ResponseWriter, r *http.Request) {
 	c := r.Context()
-	var (
-		id  int64
-		err error
-	)
 
-	if r.FormValue("ID") != "" {
-		id, err = strconv.ParseInt(r.FormValue("ID"), 10, 64)
-		if err != nil {
-			log.Warningf(c, "Erro ao converter ID: %v", err)
-			utils.RespondWithError(w, http.StatusBadRequest, 0, "Erro ao converter ID")
-			return
-		}
+	params := mux.Vars(r)
+	idSeguidor, err := strconv.ParseInt(params["idusuario"], 10, 64)
+	if err != nil {
+		log.Warningf(c, "Falha ao converter id do usuário: %v", err)
+		utils.RespondWithError(w, http.StatusBadRequest, 0, "Falha ao converter id do usuário")
 	}
 
-	filtro := usuario.Usuario{
-		ID: id,
-	}
-
-	usuarios, err := seguidores.BuscarUsuariosSeguidos(c, filtro.ID)
+	usuarios, err := seguidores.BuscarUsuariosSeguidos(c, idSeguidor)
 	if err != nil {
 		log.Warningf(c, "Erro ao efetuar a busca de usuarios %v", err)
 		utils.RespondWithError(w, http.StatusBadRequest, 0, "Erro ao efetuar a busca de usuarios")
@@ -386,18 +376,12 @@ func BuscaUsuariosSeguidos(w http.ResponseWriter, r *http.Request) {
 // Traz todas as pessoas que seguem o usuario
 func BuscaSeguidores(w http.ResponseWriter, r *http.Request) {
 	c := r.Context()
-	var (
-		idusuario int64
-		err       error
-	)
 
-	if r.FormValue("ID") != "" {
-		idusuario, err = strconv.ParseInt(r.FormValue("ID"), 10, 64)
-		if err != nil {
-			log.Warningf(c, "Erro ao converter ID: %v", err)
-			utils.RespondWithError(w, http.StatusBadRequest, 0, "Erro ao converter ID")
-			return
-		}
+	params := mux.Vars(r)
+	idUsu, err := strconv.ParseInt(params["idusuario"], 10, 64)
+	if err != nil {
+		log.Warningf(c, "Falha ao converter id do usuário: %v", err)
+		utils.RespondWithError(w, http.StatusBadRequest, 0, "Falha ao converter id do usuário")
 	}
 
 	filtro := seguidores.Seguidor{}
@@ -409,7 +393,7 @@ func BuscaSeguidores(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	usuarios, err := seguidores.BuscarSeguidores(c, seguidors, idusuario)
+	usuarios, err := seguidores.BuscarSeguidores(c, seguidors, idUsu)
 	if err != nil {
 		log.Warningf(c, "Erro ao efetuar busca de seguidores %v", err)
 		utils.RespondWithError(w, http.StatusBadRequest, 0, "Erro ao efetuar busca de seguidores")
