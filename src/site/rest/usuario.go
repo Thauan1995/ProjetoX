@@ -283,8 +283,12 @@ func DeletaUsuario(w http.ResponseWriter, r *http.Request) {
 //Permite que um usuario siga outro
 func SeguirUsuario(w http.ResponseWriter, r *http.Request) {
 	c := r.Context()
-	var usu usuario.Usuario
-
+	params := mux.Vars(r)
+	idSeguidor, err := strconv.ParseInt(params["idusuario"], 10, 64)
+	if err != nil {
+		log.Warningf(c, "Falha ao converter id do usuário: %v", err)
+		utils.RespondWithError(w, http.StatusBadRequest, 0, "Falha ao converter id do usuário")
+	}
 	seguidorID, err := autenticacao.ExtrairUsuarioID(r)
 	if err != nil {
 		log.Warningf(c, "Erro ao extrair token do usuario: %v", err)
@@ -292,26 +296,15 @@ func SeguirUsuario(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	body, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		log.Warningf(c, "Erro ao receber body de usuario: %v", err)
-		utils.RespondWithError(w, http.StatusBadRequest, 0, "Erro ao receber body de usuario")
-		return
-	}
+	seg := usuario.GetUsuario(c, idSeguidor)
 
-	if err = json.Unmarshal(body, &usu); err != nil {
-		log.Warningf(c, "Falha ao fazer unmarshal do usuario a ser seguido: %v", err)
-		utils.RespondWithError(w, http.StatusBadRequest, 0, "Falha ao fazer unmarshal do usuario a ser seguido")
-		return
-	}
-
-	if seguidorID == usu.ID {
+	if seg.ID == seguidorID {
 		log.Warningf(c, "Não é possivel seguir você mesmo")
 		utils.RespondWithError(w, http.StatusForbidden, 0, "Não é possivel seguir você mesmo")
 		return
 	}
 
-	if err = seguidores.Seguir(c, usu.ID, seguidorID); err != nil {
+	if err = seguidores.Seguir(c, seg.ID, seguidorID); err != nil {
 		log.Warningf(c, "Erro seguir usuario %v", err)
 		utils.RespondWithError(w, http.StatusBadRequest, 0, "Erro ao seguir usuario")
 		return
@@ -325,8 +318,12 @@ func SeguirUsuario(w http.ResponseWriter, r *http.Request) {
 //Permite que um usuario pare de seguir outro
 func UnFollowUsuarios(w http.ResponseWriter, r *http.Request) {
 	c := r.Context()
-	var usu usuario.Usuario
-
+	params := mux.Vars(r)
+	idSeguidor, err := strconv.ParseInt(params["idusuario"], 10, 64)
+	if err != nil {
+		log.Warningf(c, "Falha ao converter id do usuário: %v", err)
+		utils.RespondWithError(w, http.StatusBadRequest, 0, "Falha ao converter id do usuário")
+	}
 	seguidorID, err := autenticacao.ExtrairUsuarioID(r)
 	if err != nil {
 		log.Warningf(c, "Erro ao extrair token do usuario: %v", err)
@@ -334,33 +331,22 @@ func UnFollowUsuarios(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	body, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		log.Warningf(c, "Erro ao receber body de usuario: %v", err)
-		utils.RespondWithError(w, http.StatusBadRequest, 0, "Erro ao receber body de usuario")
-		return
-	}
+	seg := usuario.GetUsuario(c, idSeguidor)
 
-	if err = json.Unmarshal(body, &usu); err != nil {
-		log.Warningf(c, "Falha ao fazer unmarshal do usuario a ser seguido: %v", err)
-		utils.RespondWithError(w, http.StatusBadRequest, 0, "Falha ao fazer unmarshal do usuario a ser seguido")
-		return
-	}
-
-	if seguidorID == usu.ID {
+	if seg.ID == seguidorID {
 		log.Warningf(c, "Não é possivel parar de seguir você mesmo")
 		utils.RespondWithError(w, http.StatusForbidden, 0, "Não é possivel parar de seguir você mesmo")
 		return
 	}
 
-	if err = seguidores.PararDeSeguir(c, usu.ID, seguidorID); err != nil {
+	if err = seguidores.PararDeSeguir(c, seg.ID, seguidorID); err != nil {
 		log.Warningf(c, "Erro ao parar de seguir usuario %v", err)
 		utils.RespondWithError(w, http.StatusBadRequest, 0, "Erro ao parar de seguir usuario")
 		return
 	}
 
-	log.Debugf(c, "Sucesso em parar de seguir usuario")
-	utils.RespondWithJSON(w, http.StatusOK, "Sucesso em parar de seguir usuario")
+	log.Debugf(c, "Sucesso em deixar de seguir usuario")
+	utils.RespondWithJSON(w, http.StatusOK, "Sucesso em deixar de seguir usuario")
 	return
 }
 
