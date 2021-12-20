@@ -19,7 +19,7 @@
                        <h5 class="card-title">Usuários Encontrados</h5>
                        {{range .}}
                             <p class="card-text">
-                                {{.Nome}} - <a href="/usuario/{{.ID}}">{{.Nick}}</a> - Membro Desde: {{.CriadoEm.Format "02/01/2006"}}
+                                {{.Nome}} - <a href="/web/usuario/{{.ID}}">{{.Nick}}</a> - Membro Desde: {{.CriadoEm.Format "02/01/2006"}}
                             </p>
                         {{else}}
                             <p class="card-text">
