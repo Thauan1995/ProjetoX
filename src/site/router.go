@@ -23,9 +23,9 @@ func main() {
 	r.HandleFunc("/usuario/buscar", middlewares.Autenticar(rest.BuscaUsuarioHandler))               //Busca um usuario
 	r.HandleFunc("/usuario/atualizar", middlewares.Autenticar(rest.AtualizaUsuarioHandler))         //Atualiza dados do usuario
 	r.HandleFunc("/usuario/{id}/atualizarSenha", middlewares.Autenticar(rest.AtualizaSenhaHandler)) //Atualiza senha do usuario
-	r.HandleFunc("/usuario/deletar", middlewares.Autenticar(rest.DeletaUsuarioHandler))             //Exclui um usuario
-	r.HandleFunc("/usuario/seguir", middlewares.Autenticar(rest.SeguirHandler))                     //Segue um usuario
-	r.HandleFunc("/usuario/unfollow", middlewares.Autenticar(rest.UnFollowHandler))                 //Para de seguir um usuario
+	r.HandleFunc("/usuario/deletar/{idusuario}", middlewares.Autenticar(rest.DeletaUsuarioHandler)) //Exclui um usuario
+	r.HandleFunc("/usuario/seguir/{idusuario}", middlewares.Autenticar(rest.SeguirHandler))         //Segue um usuario
+	r.HandleFunc("/usuario/unfollow/{idusuario}", middlewares.Autenticar(rest.UnFollowHandler))     //Para de seguir um usuario
 	r.HandleFunc("/usuario/seguidos", middlewares.Autenticar(rest.BuscaUsuariosSeguidosHandler))    //Busca todos os usuarios que determinado usuario segue
 	r.HandleFunc("/usuario/seguidores", middlewares.Autenticar(rest.BuscaSeguidoresHandler))        //Busca todos os usuarios que seguem determinado usuario
 
