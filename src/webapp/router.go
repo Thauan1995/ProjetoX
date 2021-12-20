@@ -36,6 +36,7 @@ func main() {
 	r.HandleFunc("/criar-usuario", rest.CarregarTelaCadastroUsuario)
 	r.HandleFunc("/usuario/registrar", rest.CriarUsuarioHandler)
 	r.HandleFunc("/buscar-usuarios", middlewares.Logger(middlewares.Autenticar(rest.CarregarPagUsuarioHandler)))
+	r.HandleFunc("/usuario/{idusuario}", middlewares.Logger(middlewares.Autenticar(rest.CarregarPerfilUsuarioHandler)))
 
 	//Home
 	r.HandleFunc("/home", middlewares.Logger(middlewares.Autenticar(rest.HomeHandler)))

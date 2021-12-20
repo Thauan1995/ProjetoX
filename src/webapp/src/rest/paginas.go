@@ -58,6 +58,13 @@ func CarregarPagUsuarioHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func CarregarPerfilUsuarioHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodGet {
+		CarregarPerfilUsuario(w, r)
+		return
+	}
+}
+
 //Renderiza a tela de login
 func CarregarTelaLogin(w http.ResponseWriter, r *http.Request) {
 	cookie, _ := cookies.Ler(r)
@@ -163,4 +170,18 @@ func CarregarPaginaUsuarios(w http.ResponseWriter, r *http.Request) {
 	}
 
 	utils.ExecutarTemplate(w, "usuarios.html", usuarios)
+}
+
+//Renderiza a pagina do perfil do usuario
+func CarregarPerfilUsuario(w http.ResponseWriter, r *http.Request) {
+	parametros := mux.Vars(r)
+	usuarioID, err := strconv.ParseInt(parametros["idusuario"], 10, 64)
+	if err != nil {
+		utils.JSON(w, http.StatusBadRequest, utils.ErroAPI{Erro: err.Error()})
+		return
+	}
+
+	usuario, err := modelos.BuscarUsuarioCompleto(usuarioID, r)
+	fmt.Println(usuario)
+
 }
