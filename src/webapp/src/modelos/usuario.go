@@ -78,7 +78,7 @@ func BuscarUsuarioCompleto(usuarioID int64, r *http.Request) (Usuario, error) {
 
 //Chama API para buscar os dados do usuario
 func BuscarDadosUsuario(canal chan<- Usuario, usuarioID int64, r *http.Request) {
-	url := fmt.Sprintf("%s/usuarios/buscar?ID=%d", config.ApiUrl, usuarioID)
+	url := fmt.Sprintf("%s/usuario/buscar?ID=%d", config.ApiUrl, usuarioID)
 	resp, err := requisicoes.FazerRequisicaoComAutenticacao(r, http.MethodGet, url, nil)
 	if err != nil {
 		canal <- Usuario{}
@@ -86,13 +86,21 @@ func BuscarDadosUsuario(canal chan<- Usuario, usuarioID int64, r *http.Request) 
 	}
 	defer resp.Body.Close()
 
-	var usuario Usuario
+	var usu Usuario
+	var usuario []Usuario
 	if err = json.NewDecoder(resp.Body).Decode(&usuario); err != nil {
 		canal <- Usuario{}
 		return
 	}
+	for _, v := range usuario {
+		usu.ID = v.ID
+		usu.Nome = v.Nome
+		usu.Email = v.Email
+		usu.Nick = v.Nick
+		usu.CriadoEm = v.CriadoEm
+	}
 
-	canal <- usuario
+	canal <- usu
 }
 
 //Chama API para buscar os seguidores do usuario
