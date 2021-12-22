@@ -6,14 +6,32 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 	"webapp/src/config"
+	"webapp/src/requisicoes"
 	"webapp/src/utils"
+
+	"github.com/gorilla/mux"
 )
 
 func CriarUsuarioHandler(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method == http.MethodPost {
 		CriarUsuario(w, r)
+		return
+	}
+}
+
+func PararDeSeguirHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodPost {
+		PararDeSeguir(w, r)
+		return
+	}
+}
+
+func SeguirHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodPost {
+		Seguir(w, r)
 		return
 	}
 }
@@ -43,6 +61,56 @@ func CriarUsuario(w http.ResponseWriter, r *http.Request) {
 	resp, err := client.Do(req)
 	if err != nil {
 		log.Fatal(err)
+		return
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode >= 400 {
+		utils.TratarStatusCodeErro(w, resp)
+		return
+	}
+
+	utils.JSON(w, resp.StatusCode, nil)
+}
+
+//Chama a API para parar de seguir um usuario
+func PararDeSeguir(w http.ResponseWriter, r *http.Request) {
+	parametros := mux.Vars(r)
+	usuarioID, err := strconv.ParseInt(parametros["idusuario"], 10, 64)
+	if err != nil {
+		utils.JSON(w, http.StatusBadRequest, utils.ErroAPI{Erro: err.Error()})
+		return
+	}
+
+	url := fmt.Sprintf("%s/usuario/unfollow/%d", config.ApiUrl, usuarioID)
+	resp, err := requisicoes.FazerRequisicaoComAutenticacao(r, http.MethodPut, url, nil)
+	if err != nil {
+		utils.JSON(w, http.StatusInternalServerError, utils.ErroAPI{Erro: err.Error()})
+		return
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode >= 400 {
+		utils.TratarStatusCodeErro(w, resp)
+		return
+	}
+
+	utils.JSON(w, resp.StatusCode, nil)
+}
+
+//Chama a API para seguir um usuario
+func Seguir(w http.ResponseWriter, r *http.Request) {
+	parametros := mux.Vars(r)
+	usuarioID, err := strconv.ParseInt(parametros["idusuario"], 10, 64)
+	if err != nil {
+		utils.JSON(w, http.StatusBadRequest, utils.ErroAPI{Erro: err.Error()})
+		return
+	}
+
+	url := fmt.Sprintf("%s/usuario/seguir/%d", config.ApiUrl, usuarioID)
+	resp, err := requisicoes.FazerRequisicaoComAutenticacao(r, http.MethodPut, url, nil)
+	if err != nil {
+		utils.JSON(w, http.StatusInternalServerError, utils.ErroAPI{Erro: err.Error()})
 		return
 	}
 	defer resp.Body.Close()

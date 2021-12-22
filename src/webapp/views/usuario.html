@@ -44,8 +44,10 @@
                             {{if $SeguidoPeloUsuarioLogado}}
                             <button id="parar-de-seguir" class="btn btn-info" data-usuario-id="{{.Usuario.ID}}">
                                 Parar de Seguir
-                            </button>    
+                            </button>  
+
                             {{else}}
+                            
                             <button id="seguir" class="btn btn-info" data-usuario-id="{{.Usuario.ID}}">
                             Seguir
                             </button>
@@ -81,6 +83,7 @@
     {{template "scripts"}}
 
     <script src="/assets/js/publicacoes.js"></script>
+    <script src="/assets/js/usuario.js"></script>
 </body>
 
 </html>
