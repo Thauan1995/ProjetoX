@@ -182,6 +182,19 @@ func CarregarPerfilUsuario(w http.ResponseWriter, r *http.Request) {
 	}
 
 	usuario, err := modelos.BuscarUsuarioCompleto(usuarioID, r)
-	fmt.Println(usuario)
+	if err != nil {
+		utils.JSON(w, http.StatusInternalServerError, utils.ErroAPI{Erro: err.Error()})
+		return
+	}
 
+	cookie, _ := cookies.Ler(r)
+	usuarioLogadoID, _ := strconv.ParseInt(cookie["id"], 10, 64)
+
+	utils.ExecutarTemplate(w, "usuario.html", struct {
+		Usuario         modelos.Usuario
+		UsuarioLogadoID int64
+	}{
+		Usuario:         usuario,
+		UsuarioLogadoID: usuarioLogadoID,
+	})
 }
