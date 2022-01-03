@@ -1,0 +1,16 @@
+{{ define "modal-seguindo" }}
+<div class="modal fade" id="modal-seguindo" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Seguindo</h2>
+            </div>
+            <div class="modal-body">
+                {{range .Seguindo}}
+                    <a href="/web/usuario/{{.ID}}">{{.Nick}}<br></a>
+                {{end}}
+            </div>
+        </div>
+    </div>
+</div>
+{{end}}
