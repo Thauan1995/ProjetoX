@@ -245,20 +245,24 @@ func InserirUsuario(c context.Context, usuario *Usuario) error {
 	return PutUsuario(c, usuario)
 }
 
-func AtualizarUsuario(c context.Context, usuario Usuario) error {
-	usuarioBanco := GetUsuario(c, usuario.ID)
+func AtualizarUsuario(c context.Context, usuario *Usuario, usuNovo Usuario) error {
 
 	if err := usuario.Preparar("edicao"); err != nil {
 		log.Warningf(c, "Erro ao preparar usuario para edição %v", err)
 		return fmt.Errorf("Erro ao preparar usuario prar edição")
 	}
 
-	usuarioBanco.Nome = usuario.Nome
-	usuarioBanco.Nick = usuario.Nick
-	usuarioBanco.Email = usuario.Email
-	usuario.Senha = usuarioBanco.Senha
+	if usuNovo.Nome != "" {
+		usuario.Nome = usuNovo.Nome
+	}
+	if usuNovo.Nick != "" {
+		usuario.Nick = usuNovo.Nick
+	}
+	if usuNovo.Email != "" {
+		usuario.Email = usuNovo.Email
+	}
 
-	return PutUsuario(c, &usuario)
+	return PutUsuario(c, usuario)
 }
 
 func DeletarUsuario(c context.Context, usuario Usuario) error {

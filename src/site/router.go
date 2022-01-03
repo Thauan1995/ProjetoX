@@ -21,7 +21,7 @@ func main() {
 	r.HandleFunc("/usuario/registrar", rest.RegistraUsuarioHandler)                                          //Registra um usuario
 	r.HandleFunc("/usuario/login", rest.LoginHandler)                                                        //Efetua login do usuario
 	r.HandleFunc("/usuario/buscar", middlewares.Autenticar(rest.BuscaUsuarioHandler))                        //Busca um usuario
-	r.HandleFunc("/usuario/atualizar", middlewares.Autenticar(rest.AtualizaUsuarioHandler))                  //Atualiza dados do usuario
+	r.HandleFunc("/usuario/atualizar/{idusuario}", middlewares.Autenticar(rest.AtualizaUsuarioHandler))      //Atualiza dados do usuario
 	r.HandleFunc("/usuario/{id}/atualizarSenha", middlewares.Autenticar(rest.AtualizaSenhaHandler))          //Atualiza senha do usuario
 	r.HandleFunc("/usuario/deletar/{idusuario}", middlewares.Autenticar(rest.DeletaUsuarioHandler))          //Exclui um usuario
 	r.HandleFunc("/usuario/seguir/{idusuario}", middlewares.Autenticar(rest.SeguirHandler))                  //Segue um usuario

@@ -72,6 +72,13 @@ func CarregarPerfilUsuarioLogadoHandler(w http.ResponseWriter, r *http.Request) 
 	}
 }
 
+func CarregarPagEdicaoHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodGet {
+		CarregarPagEdicao(w, r)
+		return
+	}
+}
+
 //Renderiza a tela de login
 func CarregarTelaLogin(w http.ResponseWriter, r *http.Request) {
 	cookie, _ := cookies.Ler(r)
@@ -223,4 +230,21 @@ func CarregarPerfilUsuarioLogado(w http.ResponseWriter, r *http.Request) {
 	}
 
 	utils.ExecutarTemplate(w, "perfil.html", usuario)
+}
+
+//Renderiza a pagina para edição do usuario
+func CarregarPagEdicao(w http.ResponseWriter, r *http.Request) {
+	cookie, _ := cookies.Ler(r)
+	usuarioID, _ := strconv.ParseInt(cookie["id"], 10, 64)
+
+	canal := make(chan modelos.Usuario)
+	go modelos.BuscarDadosUsuario(canal, usuarioID, r)
+	usuario := <-canal
+
+	if usuario.ID == 0 {
+		utils.JSON(w, http.StatusInternalServerError, utils.ErroAPI{Erro: "Erro ao buscar usuario"})
+		return
+	}
+
+	utils.ExecutarTemplate(w, "editar-usuario.html", usuario)
 }
