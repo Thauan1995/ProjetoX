@@ -8,6 +8,10 @@
             <div class="modal-body">
                 {{range .Seguindo}}
                     <a href="/web/usuario/{{.ID}}">{{.Nick}}<br></a>
+                {{else}}
+                    <p class="text-muted text-center">
+                        Não segue ninguem até o momento...
+                    </p>
                 {{end}}
             </div>
         </div>
