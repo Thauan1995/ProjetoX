@@ -205,7 +205,12 @@ func InsereUsuario(w http.ResponseWriter, r *http.Request) {
 func AtualizaUsuario(w http.ResponseWriter, r *http.Request) {
 	c := r.Context()
 
-	var usu usuario.Usuario
+	params := mux.Vars(r)
+	idUsu, err := strconv.ParseInt(params["idusuario"], 10, 64)
+	if err != nil {
+		log.Warningf(c, "Falha ao converter id do usuário: %v", err)
+		utils.RespondWithError(w, http.StatusBadRequest, 0, "Falha ao converter id do usuário")
+	}
 
 	usuarioIDNoToken, err := autenticacao.ExtrairUsuarioID(r)
 	if err != nil {
@@ -213,20 +218,7 @@ func AtualizaUsuario(w http.ResponseWriter, r *http.Request) {
 		utils.RespondWithError(w, http.StatusBadRequest, 0, "Erro ao extrair token do usuario da requisição")
 		return
 	}
-
-	body, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		log.Warningf(c, "Erro ao receber body de usuario: %v", err)
-		utils.RespondWithError(w, http.StatusBadRequest, 0, "Erro ao receber body de usuario")
-		return
-	}
-
-	err = json.Unmarshal(body, &usu)
-	if err != nil {
-		log.Warningf(c, "Falha ao fazer unmarshal de usuario %v", err)
-		utils.RespondWithError(w, http.StatusBadRequest, 0, "Falha ao fazer unmarshal de usuario")
-		return
-	}
+	usu := usuario.GetUsuario(c, idUsu)
 
 	if usu.ID != usuarioIDNoToken {
 		log.Warningf(c, "Usuario não tem autorizaçao para fazer essa ação")
@@ -234,7 +226,16 @@ func AtualizaUsuario(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = usuario.AtualizarUsuario(c, usu)
+	corpoRequisicao, err := ioutil.ReadAll(r.Body)
+
+	var usuNovo usuario.Usuario
+	if err = json.Unmarshal(corpoRequisicao, &usuNovo); err != nil {
+		log.Warningf(c, "Falha ao realizar unmarshal da requisição para alterar senha %v", err)
+		utils.RespondWithError(w, http.StatusBadRequest, 0, "Falha ao realizar unmarshal da requisição para alterar senha")
+		return
+	}
+
+	err = usuario.AtualizarUsuario(c, usu, usuNovo)
 	if err != nil {
 		log.Warningf(c, "Erro ao atualizar usuario %v", err)
 		utils.RespondWithError(w, http.StatusBadRequest, 0, "Erro ao atualizar usuario")
