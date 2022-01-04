@@ -37,13 +37,6 @@ func SeguirHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func AtualizaUsuarioHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method == http.MethodPut {
-		EditarUsuario(w, r)
-		return
-	}
-}
-
 //Chama a API para cadastrar um usuario no banco de dados
 func CriarUsuario(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()

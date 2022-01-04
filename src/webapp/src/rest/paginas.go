@@ -77,6 +77,10 @@ func CarregarPagEdicaoHandler(w http.ResponseWriter, r *http.Request) {
 		CarregarPagEdicao(w, r)
 		return
 	}
+	if r.Method == http.MethodPut {
+		EditarUsuario(w, r)
+		return
+	}
 }
 
 //Renderiza a tela de login
