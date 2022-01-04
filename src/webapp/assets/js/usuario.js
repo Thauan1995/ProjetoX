@@ -39,9 +39,9 @@ function editar(evento){
         url: "/web/editar-usuario",
         method: "PUT",
         data: {
-            nome: $("#nome").val(),
-            email: $("#email").val(),
-            nick: $("#nick").val(),
+            nome: $('#nome').val(),
+            email: $('#email').val(),
+            nick: $('#nick').val(),
         }
     }).done(function() {
         Swal.fire("Sucesso!", "Usuario atualizado com sucesso!", "success")

@@ -21,7 +21,7 @@
 {{ define "cabecalho-publicacao" }}
     <h1 class="display-4">{{.Titulo}}</h1>
     <p class="lead">{{.Conteudo}}</p>
-    <a href="usuario/{{.AutorID}}">{{.AutorNick}} - {{.DataCriacao.Format "02/01/2006"}}</a>
+    <a href="/web/usuario/{{.AutorID}}">{{.AutorNick}} - {{.DataCriacao.Format "02/01/2006"}}</a>
     <hr class="my-4">
 {{ end }}
 
