@@ -42,6 +42,7 @@ func main() {
 	r.HandleFunc("/perfil", middlewares.Logger(middlewares.Autenticar(rest.CarregarPerfilUsuarioLogadoHandler)))
 	r.HandleFunc("/editar-usuario", middlewares.Logger(middlewares.Autenticar(rest.PagEdicaoHandler)))
 	r.HandleFunc("/atualizar-senha", middlewares.Logger(middlewares.Autenticar(rest.PagAttSenhaHandler)))
+	r.HandleFunc("/deletar-usuario", middlewares.Logger(middlewares.Autenticar(rest.DeletarUsuario)))
 
 	//Home
 	r.HandleFunc("/home", middlewares.Logger(middlewares.Autenticar(rest.HomeHandler)))
