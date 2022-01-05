@@ -37,6 +37,13 @@ func SeguirHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func DeletaUsuarioHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodDelete {
+		DeletarUsuario(w, r)
+		return
+	}
+}
+
 //Chama a API para cadastrar um usuario no banco de dados
 func CriarUsuario(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
@@ -175,6 +182,28 @@ func AtualizarSenha(w http.ResponseWriter, r *http.Request) {
 
 	url := fmt.Sprintf("%s/usuario/%d/atualizarSenha", config.ApiUrl, usuarioID)
 	resp, err := requisicoes.FazerRequisicaoComAutenticacao(r, http.MethodPut, url, bytes.NewBuffer(senhas))
+	if err != nil {
+		utils.JSON(w, http.StatusInternalServerError, utils.ErroAPI{Erro: err.Error()})
+		return
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode >= 400 {
+		utils.TratarStatusCodeErro(w, resp)
+		return
+	}
+
+	utils.JSON(w, resp.StatusCode, nil)
+}
+
+//Chama a API para excluir o usuario do banco de dados
+func DeletarUsuario(w http.ResponseWriter, r *http.Request) {
+	cookie, _ := cookies.Ler(r)
+	usuarioID, _ := strconv.ParseInt(cookie["id"], 10, 64)
+
+	url := fmt.Sprintf("%s/usuario/deletar/%d", config.ApiUrl, usuarioID)
+
+	resp, err := requisicoes.FazerRequisicaoComAutenticacao(r, http.MethodDelete, url, nil)
 	if err != nil {
 		utils.JSON(w, http.StatusInternalServerError, utils.ErroAPI{Erro: err.Error()})
 		return
