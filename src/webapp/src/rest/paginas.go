@@ -72,13 +72,24 @@ func CarregarPerfilUsuarioLogadoHandler(w http.ResponseWriter, r *http.Request) 
 	}
 }
 
-func CarregarPagEdicaoHandler(w http.ResponseWriter, r *http.Request) {
+func PagEdicaoHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodGet {
 		CarregarPagEdicao(w, r)
 		return
 	}
 	if r.Method == http.MethodPut {
 		EditarUsuario(w, r)
+		return
+	}
+}
+
+func PagAttSenhaHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodGet {
+		CarregarPagAttSenha(w, r)
+		return
+	}
+	if r.Method == http.MethodPut {
+		AtualizarSenha(w, r)
 		return
 	}
 }
@@ -251,4 +262,9 @@ func CarregarPagEdicao(w http.ResponseWriter, r *http.Request) {
 	}
 
 	utils.ExecutarTemplate(w, "editar-usuario.html", usuario)
+}
+
+//Renderiza a pagina para atualização de senha
+func CarregarPagAttSenha(w http.ResponseWriter, r *http.Request) {
+	utils.ExecutarTemplate(w, "atualizar-senha.html", nil)
 }

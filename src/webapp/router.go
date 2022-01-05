@@ -40,7 +40,8 @@ func main() {
 	r.HandleFunc("/usuario/{idusuario}/parar-de-seguir", middlewares.Logger(middlewares.Autenticar(rest.PararDeSeguirHandler)))
 	r.HandleFunc("/usuario/{idusuario}/seguir", middlewares.Logger(middlewares.Autenticar(rest.SeguirHandler)))
 	r.HandleFunc("/perfil", middlewares.Logger(middlewares.Autenticar(rest.CarregarPerfilUsuarioLogadoHandler)))
-	r.HandleFunc("/editar-usuario", middlewares.Logger(middlewares.Autenticar(rest.CarregarPagEdicaoHandler)))
+	r.HandleFunc("/editar-usuario", middlewares.Logger(middlewares.Autenticar(rest.PagEdicaoHandler)))
+	r.HandleFunc("/atualizar-senha", middlewares.Logger(middlewares.Autenticar(rest.PagAttSenhaHandler)))
 
 	//Home
 	r.HandleFunc("/home", middlewares.Logger(middlewares.Autenticar(rest.HomeHandler)))
