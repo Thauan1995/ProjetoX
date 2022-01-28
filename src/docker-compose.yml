@@ -1,0 +1,31 @@
+version: '3.3'
+
+services:
+  
+  app:
+    container_name: WebConteiner
+    build: 
+      dockerfile: ./web.Dockerfile
+      context: .
+    volumes:
+      - app:/app/webapp
+    ports:
+    - 8000:8000
+    depends_on:
+      - api
+  
+  api:
+    container_name: ApiContainer
+    build:
+      dockerfile: ./api.Dockerfile
+      context: .
+    volumes:
+    - api:/api/site
+    ports:
+    - 5000:5000
+    expose:
+      - 5000
+
+volumes:
+  api:
+  app:
