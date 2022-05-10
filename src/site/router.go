@@ -17,6 +17,9 @@ func main() {
 	//Config
 	r.HandleFunc("/config", rest.ConfigHandler)
 
+	//Estabelecimento
+	r.HandleFunc("/estabelecimento", middlewares.Autenticar(rest.EstabelecimentoHandler))
+
 	//Usuario
 	r.HandleFunc("/usuario/registrar", rest.RegistraUsuarioHandler)                                          //Registra um usuario
 	r.HandleFunc("/usuario/login", rest.LoginHandler)                                                        //Efetua login do usuario
